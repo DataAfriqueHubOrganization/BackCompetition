@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +27,11 @@ SECRET_KEY = "django-insecure-r27j=if+qc2wyb#3!i^*eo2i6ik(k!8hlmn^alksvfi)$_xr)p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Par exemple, si tu utilises un frontend sur un autre port
+]
 
 # Application definition
 
@@ -39,8 +44,33 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'rest_framework',
     'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     "back_datatour",
+    'rest_framework.authtoken',  # Si tu utilises les tokens classiques (pas nécessaire pour JWT)
+    'corsheaders',  # Si tu as besoin de gérer les CORS
 ]
+
+
+
+# Configuration du Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Les vues seront protégées par défaut
+    ],
+}
+
+# Configuration spécifique à Simple JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Durée de vie du token d'accès (30 minutes ici)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Durée de vie du refresh token (1 jour ici)
+    'ROTATE_REFRESH_TOKENS': False,  # Si tu veux ou non faire tourner les refresh tokens
+    'BLACKLIST_AFTER_ROTATION': True,  # Si tu veux bloquer les anciens refresh tokens
+}
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -50,6 +80,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    
+    'allauth.account.middleware.AccountMiddleware', 
+
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = "settings.urls"
@@ -124,3 +159,18 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+########################################
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'fatoufall194@gmail.com'
+EMAIL_HOST_PASSWORD = 'fall@123'  # Remplace par ton mot de passe d'application
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
