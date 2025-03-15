@@ -40,26 +40,19 @@ class Team(TimeStampedModel):
     name = models.CharField(max_length=255)
     country = models.ForeignKey(Country, on_delete=models.PROTECT)
     members = models.ManyToManyField(Users, related_name="teams")
-    leader = models.ForeignKey(Users, on_delete=models.PROTECT, null=True, blank=True,
-                               related_name="led_teams")  # Leader de l'équipe
-
-    def clean(self):
-        if self.pk and self.members.count() != 3:
-            raise ValidationError("Une équipe doit avoir 3 membres.")
-        if self.leader and self.leader not in self.members.all():
-            raise ValidationError("Le leader doit faire partie des membres de l'équipe.")
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Sauvegarde d'abord pour pouvoir accéder aux membres
-        if self.pk and self.members.count() != 3:
-            raise ValidationError("Une équipe doit avoir au moins 3 membres.")
-        if self.leader and self.leader not in self.members.all():
-            raise ValidationError("Le leader doit faire partie des membres de l'équipe.")
+    leader = models.ForeignKey(
+        Users,
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name="led_teams"
+    )  # Leader de l'équipe
 
 
 class Partner(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    logo = models.ImageField(upload_to='static/partners/', null=True, blank=True)
+    website_url = models.URLField(null=True, blank=True)
 
 
 class Competition(TimeStampedModel):
@@ -120,7 +113,7 @@ class Submission(TimeStampedModel):
 
 class Comment(TimeStampedModel):
     users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_comment")
-    compétition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, related_name="competition_phase")
+    competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, related_name="competition_phase")
     content = models.TextField()
 
 
