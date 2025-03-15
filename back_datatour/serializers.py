@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from back_datatour.models import Users, Partner, Team
 from allauth.account.models import EmailAddress
@@ -9,7 +10,9 @@ class PartnerSerializer(serializers.ModelSerializer):
         model = Partner
         fields = [
             'name',
-            'description'
+            'description',
+            'logo',
+            'website_url'
         ]
 
 
@@ -20,7 +23,7 @@ class TeamSerializer(serializers.ModelSerializer):
             'name',
             'country',
             'members',
-            'leader'
+            'leader',
         ]
 
     def validate(self, data):
@@ -32,6 +35,9 @@ class TeamSerializer(serializers.ModelSerializer):
 
         if len(members) != 3:
             raise serializers.ValidationError("A team should have exactly 3 members")
+
+        if not leader:
+            raise serializers.ValidationError("A leader for the team is required")
 
         if leader and leader not in members:
             raise serializers.ValidationError("the leader need to be a team member")

@@ -51,6 +51,8 @@ class Team(TimeStampedModel):
 class Partner(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    logo = models.ImageField(upload_to='static/partners/', null=True, blank=True)
+    website_url = models.URLField(null=True, blank=True)
 
 
 class Competition(TimeStampedModel):
@@ -111,7 +113,7 @@ class Submission(TimeStampedModel):
 
 class Comment(TimeStampedModel):
     users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_comment")
-    compétition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, related_name="competition_phase")
+    competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, related_name="competition_phase")
     content = models.TextField()
 
 
