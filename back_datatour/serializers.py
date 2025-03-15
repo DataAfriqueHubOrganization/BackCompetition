@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from back_datatour.models import Users
-from allauth.account.models import EmailAddress
+from .models import Competition, CompetitionPhase
+from allauth.account.models import EmailAddress 
 
 
 class UsersRegisterSerializer(serializers.ModelSerializer):
@@ -25,3 +26,18 @@ class UsersRegisterSerializer(serializers.ModelSerializer):
     #     EmailAddress.objects.create(user=user, email=validated_data['email'], verified=False)
     #
     #     return user
+
+
+class CompetitionPhaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompetitionPhase
+        fields = ['id', 'competition', 'name', 'start_date', 'end_date']
+
+class CompetitionSerializer(serializers.ModelSerializer):
+    phases = CompetitionPhaseSerializer(many=True, read_only=True, source='competitionphase_set')
+    
+    class Meta:
+        model = Competition
+        fields = ['id', 'name', 'description', 'status', 'inscription_start', 
+                  'inscription_end', 'partners', 'phases']
+
