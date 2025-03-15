@@ -25,3 +25,15 @@ class UsersRegisterSerializer(serializers.ModelSerializer):
     #     EmailAddress.objects.create(user=user, email=validated_data['email'], verified=False)
     #
     #     return user
+
+from .models import Comment, Announcement
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'users', 'compétition_phase', 'content', 'created_at', 'updated_at']
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = ['id', 'users', 'name', 'description', 'created_at', 'updated_at']
