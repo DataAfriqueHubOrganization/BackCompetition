@@ -27,7 +27,7 @@ jobs:
       # 6. Create Django .env file
       - name: Create Django .env file
         run: |
-            echo "${{ secrets.DJANGO_ENV }}" > /.env
+            echo "${{ secrets.DJANGO_ENV }}" >> .env
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
