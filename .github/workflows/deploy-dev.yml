@@ -1,0 +1,65 @@
+name: Build and Deploy Django App
+
+on:
+  push:
+    branches:
+      - development # Trigger only on the main branch
+
+#permissions:
+#  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Python for Django
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      # 3. Create .env file from secrets
+      # 6. Create Django .env file
+      - name: Create Django .env file
+        run: |
+            echo "${{ secrets.DJANGO_ENV }}" > /.env
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:   
+            host: ${{ secrets.SERVER_IP }}
+            username: ${{ secrets.SERVER_USER }}
+            password: ${{ secrets.SERVER_PASSWORD }}
+            source: "./*,!.github/*,!.vscode/*"
+            target: ${{ secrets.DEPLOY_PATH }}/
+      - name: Deploy to VM via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+            host: ${{ secrets.SERVER_IP }}
+            username: ${{ secrets.SERVER_USER }}
+            key: ${{ secrets.SERVER_PASSWORD }}
+            script: |
+
+                cd ${{ secrets.DEPLOY_PATH }}
+                python -m venv venv
+                source venv/bin/activate
+                pip install -r requirements.txt
+                python -m pip install uwsgi
+                uwsgi --chdir=${{ secrets.DEPLOY_PATH }} \
+                --module=back_datatour.wsgi:application \
+                --env DJANGO_SETTINGS_MODULE=back_datatour.settings \
+                --master \
+                #--pidfile=/tmp/project-master.pid \
+                #--socket=127.0.0.1:49152 \      # can also be a file
+                --processes=5 \                 # number of worker processes
+                #--uid=1000 --gid=2000 \         # if root, uwsgi can drop privileges
+                #--harakiri=20 \                 # respawn processes taking more than 20 seconds
+                #--max-requests=5000 \           # respawn processes after serving 5000 requests
+                --vacuum \                      # clear environment on exit
+                #--home=/path/to/virtual/env \   # optional path to a virtual environment
+                --daemonize=/var/log/uwsgi/back_datatour.log      # background the process
