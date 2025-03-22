@@ -57,7 +57,7 @@ jobs:
                 #python manage.py migrate
                 #python manage.py collectstatic --noinput
 
-                uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings \ --daemonize=/var/log/uwsgi/back_datatour.log
+                uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings \ --daemonize
                 #--chdir=${{ secrets.DEPLOY_PATH }} \
                 #--module=back_datatour.wsgi:application \
                 #--env DJANGO_SETTINGS_MODULE=back_datatour.settings \
