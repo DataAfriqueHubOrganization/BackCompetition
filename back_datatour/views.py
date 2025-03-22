@@ -1,3 +1,4 @@
+
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
@@ -9,6 +10,8 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import status, permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.renderers import JSONRenderer
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -36,6 +39,122 @@ class RegisterView(APIView):
             serializer.save()
             return Response({"message": "Inscription réussie, vérifiez votre email."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+###################################################################################
+##                                PARTNER                                        #
+###################################################################################
+class ListOrCreatePartner(APIView):
+    def get(self, request):
+        partners = Partner.objects.all()
+        if not partners.exists():
+            return Response(
+                {"message": "No partners found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = PartnerSerializer(partners, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        partner = PartnerSerializer(data=request.data)
+        if partner.is_valid():
+            partner.save()
+            return Response(
+                partner.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            partner.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class PartnerDetail(APIView):
+    def get(self, request, pk):
+        partner = get_object_or_404(Partner, pk=pk)
+        serializer = PartnerSerializer(partner)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def put(self, request, pk):
+        partner = get_object_or_404(Partner, pk=pk)
+        serializer = PartnerSerializer(
+            partner,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, pk):
+        partner = get_object_or_404(Partner, pk=pk)
+        partner.delete()
+        return Response(
+            {"message": "Partner deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+###################################################################################
+##                                TEAM                                       #
+###################################################################################
+class ListOrCreateTeam(APIView):
+    def get(self, request):
+        teams = Team.objects.all()
+        if not teams.exists():
+            return Response(
+                {"message": "No teams found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = TeamSerializer(teams, many=True)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        serializer = TeamSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+class TeamDetail(APIView):
+    def get(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        serializer = TeamSerializer(team)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        serializer = TeamSerializer(team, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        team.delete()
+        return Response({"message": "Team deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 ############## EMAIL VERIFY
 class VerifyEmailView(APIView):
