@@ -52,10 +52,11 @@ jobs:
                 #python -m venv venv
                 source venv/bin/activate
                 pip install -r requirements.txt
+                pip install django-cors-headers
                 #pip install gunicorn psycopg2-binary
 
-                #python manage.py migrate
-                #python manage.py collectstatic --noinput
+                python manage.py migrate
+                python manage.py collectstatic --noinput
                 gunicorn --workers 3 --bind 0.0.0.0:8000 --daemon back_datatour.settings.wsgi:application:application
 
                 #uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings
