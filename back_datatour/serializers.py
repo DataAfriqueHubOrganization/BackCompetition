@@ -7,8 +7,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import *
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+# class RegisterSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True)
 
 class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,7 +50,7 @@ class TeamSerializer(serializers.ModelSerializer):
         return data
 
 
-class UsersRegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
