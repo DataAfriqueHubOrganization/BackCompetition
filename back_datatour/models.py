@@ -39,11 +39,19 @@ class Team(TimeStampedModel):
     name = models.CharField(max_length=255)
     country = models.ForeignKey(Country, on_delete=models.PROTECT)
     members = models.ManyToManyField(Users, related_name="teams")
-    leader = models.ForeignKey(Users, on_delete=models.PROTECT, null=True, blank=True, related_name="led_teams")  # Leader de l'équipe
+    leader = models.ForeignKey(
+        Users,
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name="led_teams"
+    )  # Leader de l'équipe
+
 
 class Partner(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    logo = models.ImageField(upload_to='static/partners/', null=True, blank=True)
+    website_url = models.URLField(null=True, blank=True)
 
 class Competition(TimeStampedModel):
     Statut_choice = [
