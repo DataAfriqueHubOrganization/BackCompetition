@@ -1,9 +1,4 @@
 from django.urls import path
-<<<<<<< HEAD
-=======
-#from back_datatour.views import UserRegister, ListOrCreatePartner, PartnerDetail, ListOrCreateTeam, TeamDetail
-
->>>>>>> 9ebd45b80e724c091c187b84a5e0a42c74ae5275
 from .views import *
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.conf import settings
