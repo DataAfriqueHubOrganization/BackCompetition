@@ -1,11 +1,7 @@
 from django.db import models
-
-# Create your models here.
-
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.exceptions import ValidationError
-
+from django.utils.crypto import get_random_string
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -14,10 +10,8 @@ class TimeStampedModel(models.Model):
     class Meta:
         abstract = True
 
-
 class Country(TimeStampedModel):
     name = models.CharField(max_length=255)
-
 
 class Users(AbstractUser):
     gender = models.CharField(
@@ -32,9 +26,14 @@ class Users(AbstractUser):
     profession = models.CharField(max_length=255)
     phone = models.CharField(max_length=50)
     is_admin = models.BooleanField(default=False)
-    # created_at = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_verified = models.BooleanField(default=False)
+    verification_token = models.CharField(max_length=64, unique=True, blank=True, null=True)
 
+    def generate_verification_token(self):
+        self.verification_token = get_random_string(64)
+        self.save()
 
 class Team(TimeStampedModel):
     name = models.CharField(max_length=255)
@@ -53,7 +52,6 @@ class Partner(models.Model):
     description = models.TextField()
     logo = models.ImageField(upload_to='static/partners/', null=True, blank=True)
     website_url = models.URLField(null=True, blank=True)
-
 
 class Competition(TimeStampedModel):
     Statut_choice = [
@@ -121,39 +119,3 @@ class Announcement(TimeStampedModel):
     users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_announcement")
     name = models.CharField(max_length=255)
     description = models.TextField()
-
-############################################
-
-
-# class Submission(models.Model):
-#     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="submissions")
-#     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, related_name="submissions")
-#     file = models.FileField(upload_to="static/submissions/")
-#     score = models.FloatField(null=True, blank=True)
-#     submitted_at = models.DateTimeField(auto_now_add=True)
-#     status = models.CharField(
-#         max_length=20, 
-#         choices=[("pending", "Pending"), ("evaluated", "Evaluated")], 
-#         default="pending"
-#     )
-
-
-# class Leaderboard(models.Model):
-#     competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name="leaderboards")
-#     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="leaderboard_entries")
-#     phase = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="leaderboard_entries")
-#     score = models.FloatField()
-#     rank = models.IntegerField()
-
-
-# # Modèle Annonce
-# class Announcement(models.Model):
-
-
-# # Modèle Commentaire
-# class Comment(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
-#
-#     content = models.TextField()
-
-#     is_moderated = models.BooleanField(default=False)
