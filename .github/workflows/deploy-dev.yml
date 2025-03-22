@@ -52,7 +52,7 @@ jobs:
                 python -m venv venv
                 source venv/bin/activate
                 pip install -r requirements.txt
-                #python -m pip install uwsgi
+                pip install uwsgi
                 uwsgi --chdir=${{ secrets.DEPLOY_PATH }} \
                 --module=back_datatour.wsgi:application \
                 --env DJANGO_SETTINGS_MODULE=back_datatour.settings \
