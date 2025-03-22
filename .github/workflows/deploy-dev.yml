@@ -53,7 +53,7 @@ jobs:
                 pip install -r requirements.txt
                 #python -m pip install uwsgi
                 uwsgi --chdir=${{ secrets.DEPLOY_PATH }} \
-                #--module=back_datatour.wsgi \
+                --module=back_datatour.wsgi:application \
                 --env DJANGO_SETTINGS_MODULE=back_datatour.settings \
                 --master \
                 #--pidfile=/tmp/project-master.pid \
@@ -63,6 +63,6 @@ jobs:
                 --uid=1000 --gid=2000 \         # if root, uwsgi can drop privileges
                 #--harakiri=20 \                 # respawn processes taking more than 20 seconds
                 --max-requests=5000 \           # respawn processes after serving 5000 requests
-                #--vacuum \                      # clear environment on exit
+                --vacuum \                      # clear environment on exit
                 #--home=/path/to/virtual/env \   # optional path to a virtual environment
                 #--daemonize=/var/log/uwsgi/back_datatour.log      # background the process
