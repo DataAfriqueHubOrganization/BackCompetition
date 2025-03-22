@@ -62,7 +62,7 @@ jobs:
                 --env DJANGO_SETTINGS_MODULE=back_datatour.settings \
                 --master \
                 --socket=0.0.0.0:8000 \      
-                --processes=5 \                 
-                --uid=1000 --gid=2000 \         
-                --max-requests=5000 \           
-                --vacuum \                      
+                #--processes=5 \                 
+                #--uid=1000 --gid=2000 \         
+                #--max-requests=5000 \           
+                #--vacuum                     
