@@ -67,4 +67,4 @@ jobs:
                 #--uid=1000 --gid=2000 \         
                 #--max-requests=5000 \           
                 #--vacuum         
-                logout
+                
