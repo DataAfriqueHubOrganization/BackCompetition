@@ -208,7 +208,7 @@ class ChangePasswordView(APIView):
         )
 
 class DeactivateAccountView(APIView):
-    permission_classes = [AllowAny]  # Autorise n'importe quel utilisateur, mais on vérifie manuellement l'authentification
+    permission_classes = [IsAuthenticated]  
 
     def post(self, request, *args, **kwargs):
         # Tentative d'authentification manuelle avec JWT
@@ -245,5 +245,4 @@ class DeactivateAccountView(APIView):
             recipient_list=[user_to_deactivate.email],
             fail_silently=False,
         )
-
         return Response({"message": "Compte désactivé avec succès."}, status=status.HTTP_200_OK)
