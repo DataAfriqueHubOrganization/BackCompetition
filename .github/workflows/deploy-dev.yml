@@ -47,8 +47,9 @@ jobs:
             script: |
 
                 cd ${{ secrets.DEPLOY_PATH }}
-                #python -m venv venv
-                #source venv/bin/activate
+                export PATH="$PATH:/usr/bin/python3"
+                python -m venv venv
+                source venv/bin/activate
                 pip install -r requirements.txt
                 #python -m pip install uwsgi
                 uwsgi --chdir=${{ secrets.DEPLOY_PATH }} \
