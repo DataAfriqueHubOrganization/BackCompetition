@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     "back_datatour",
     'rest_framework.authtoken',  
-    'corsheaders',  
+    'corsheaders',
+    'drf_yasg',  
 ]
 
 
