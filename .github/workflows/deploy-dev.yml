@@ -53,17 +53,16 @@ jobs:
                 source venv/bin/activate
                 pip install -r requirements.txt
                 pip install uwsgi
+
+                python manage.py migrate
+                python manage.py collectstatic --noinput
+
                 uwsgi --chdir=${{ secrets.DEPLOY_PATH }} \
                 --module=back_datatour.wsgi:application \
                 --env DJANGO_SETTINGS_MODULE=back_datatour.settings \
                 --master \
-                #--pidfile=/tmp/project-master.pid \
-                #--socket=127.0.0.1:49152 \      # can also be a file
                 --socket=0.0.0.0:8000 \      # can also be a file
                 --processes=5 \                 # number of worker processes
                 --uid=1000 --gid=2000 \         # if root, uwsgi can drop privileges
-                #--harakiri=20 \                 # respawn processes taking more than 20 seconds
                 --max-requests=5000 \           # respawn processes after serving 5000 requests
                 --vacuum \                      # clear environment on exit
-                #--home=/path/to/virtual/env \   # optional path to a virtual environment
-                #--daemonize=/var/log/uwsgi/back_datatour.log      # background the process
