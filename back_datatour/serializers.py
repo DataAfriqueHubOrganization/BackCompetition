@@ -10,6 +10,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
+        # fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone", "logo"]
 
     def validate_email(self, value):
         """ Vérifier que l'email est unique """
@@ -34,6 +35,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         # Envoyer l'email de vérification (optionnel)
         verification_link = f"http://127.0.0.1:8000/back_datatour/auth/verify-email/{user.verification_token}/"
-        print(verification_link)
-
+        send_mail(
+            subject="Vérification de votre compte",
+            message=f"Cliquez sur ce lien pour vérifier votre compte : {verification_link}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
         return user

@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,16 +15,22 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import *
 from .serializers import *
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 ###################################################################################
 ##                               REGISTER                                         #
 ###################################################################################
 
+User = get_user_model()
+
 ############## REGISTER
 class RegisterView(APIView):
     permission_classes = [AllowAny]  
+    #  parser_classes = (MultiPartParser, FormParser)  # Gérer les fichiers uploadés
     def post(self, request):
-        print("inside")
+        # serializer = RegisterSerializer(data=request.data, files=request.FILES)  # Inclure les fichiers
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -74,8 +80,10 @@ class LoginView(APIView):
         # Authentifier l'utilisateur avec les identifiants
         if not user.check_password(password):
             return Response({"error": "Mot de passe incorrect"}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        # Si l'utilisateur est authentifié, générer un access token et un refresh token
+          # Vérifier si le compte est vérifié
+        if  user.status is False:
+            return Response({"error": "Votre compte est désactivé. Veuillez contacter le support."}, status=status.HTTP_403_FORBIDDEN)
+
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         
@@ -112,14 +120,14 @@ class ForgotPasswordView(APIView):
         reset_link = f"http://{get_current_site(request).domain}/back_datatour/reset-password/{uid}/{token}/"
         print(reset_link)
         # Envoi de l'e-mail avec un message texte
-        # subject = 'Réinitialisation de votre mot de passe'
-        # message = f"Bonjour {user.username},\n\n" \
-        #           f"Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous pour le faire :\n\n" \
-        #           f"{reset_link}\n\n" \
-        #           f"Si vous n'avez pas demandé cette réinitialisation, ignorez cet e-mail.\n\n" \
-        #           f"Cordialement,\nL'équipe"
+        subject = 'Réinitialisation de votre mot de passe'
+        message = f"Bonjour {user.username},\n\n" \
+                  f"Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous pour le faire :\n\n" \
+                  f"{reset_link}\n\n" \
+                  f"Si vous n'avez pas demandé cette réinitialisation, ignorez cet e-mail.\n\n" \
+                  f"Cordialement,\nL'équipe"
 
-        # send_mail(subject, message, 'from@example.com', [email])
+        send_mail(subject, message, 'from@example.com', [email])
 
         return Response({"message": "Un lien de réinitialisation de mot de passe a été envoyé à votre email."}, status=status.HTTP_200_OK)
 
@@ -198,3 +206,44 @@ class ChangePasswordView(APIView):
             {"message": "Mot de passe changé avec succès."},
             status=status.HTTP_200_OK,
         )
+
+class DeactivateAccountView(APIView):
+    permission_classes = [AllowAny]  # Autorise n'importe quel utilisateur, mais on vérifie manuellement l'authentification
+
+    def post(self, request, *args, **kwargs):
+        # Tentative d'authentification manuelle avec JWT
+        try:
+            user, _ = JWTAuthentication().authenticate(request)
+            if user is None or user.is_anonymous:
+                return Response({"error": "Utilisateur non authentifié"}, status=status.HTTP_401_UNAUTHORIZED)
+            print(f"Utilisateur authentifié: {user}")
+        except Exception as e:
+            return Response({"error": "Utilisateur non authentifié"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user_id = request.data.get('user_id', None)
+        if user_id and user_id != user.id:
+            if not user.is_admin:
+                return Response({"error": "Permission refusée. Seuls les administrateurs peuvent désactiver d'autres comptes."}, status=status.HTTP_403_FORBIDDEN)
+            try:
+                user_to_deactivate = Users.objects.get(id=user_id)
+            except Users.DoesNotExist:
+                return Response({"error": "Utilisateur non trouvé."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            user_to_deactivate = user
+
+        if not user_to_deactivate.status:
+            return Response({"message": "Le compte est déjà désactivé."}, status=status.HTTP_200_OK)
+
+        user_to_deactivate.status = False
+        user_to_deactivate.save()
+
+        # Envoyer un email de notification
+        send_mail(
+            subject="Votre compte a été désactivé",
+            message="Votre compte a été désactivé. Si vous pensez qu'il s'agit d'une erreur, veuillez contacter le support.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user_to_deactivate.email],
+            fail_silently=False,
+        )
+
+        return Response({"message": "Compte désactivé avec succès."}, status=status.HTTP_200_OK)
