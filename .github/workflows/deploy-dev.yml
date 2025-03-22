@@ -48,16 +48,17 @@ jobs:
 
                 cd ${{ secrets.DEPLOY_PATH }}
                 export PATH="$PATH:/usr/bin/python3:/usr/bin/uwsgi"
-                uwsgi --version
+                #uwsgi --version
                 #python -m venv venv
                 source venv/bin/activate
                 pip install -r requirements.txt
-                pip install uwsgi
+                pip install gunicorn psycopg2-binary
 
                 #python manage.py migrate
                 #python manage.py collectstatic --noinput
+                gunicorn --workers 3 --bind 0.0.0.0:8000 --daemon back_datatour.settings.wsgi:application:application
 
-                uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings
+                #uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings
                 #--chdir=${{ secrets.DEPLOY_PATH }} \
                 #--module=back_datatour.wsgi:application \
                 #--env DJANGO_SETTINGS_MODULE=back_datatour.settings \
