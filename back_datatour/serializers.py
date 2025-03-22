@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
+from back_datatour.models import Users, Partner, Team
 from allauth.account.models import EmailAddress
 from django.core.mail import send_mail
 from django.conf import settings
@@ -7,6 +10,47 @@ from .models import *
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
+class PartnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Partner
+        fields = [
+            'name',
+            'description',
+            'logo',
+            'website_url'
+        ]
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = [
+            'name',
+            'country',
+            'members',
+            'leader',
+        ]
+
+    def validate(self, data):
+        members = data.get("members", [])
+        leader = data.get("leader", None)
+
+        if self.instance:
+            members = members or self.instance.members.all()
+
+        if len(members) != 3:
+            raise serializers.ValidationError("A team should have exactly 3 members")
+
+        if not leader:
+            raise serializers.ValidationError("A leader for the team is required")
+
+        if leader and leader not in members:
+            raise serializers.ValidationError("the leader need to be a team member")
+
+        return data
+
+
+class UsersRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
