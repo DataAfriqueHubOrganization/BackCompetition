@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+
 from back_datatour.models import Users, Partner, Team
 from allauth.account.models import EmailAddress
 from django.core.mail import send_mail
@@ -30,7 +31,6 @@ class TeamSerializer(serializers.ModelSerializer):
             'members',
             'leader',
         ]
-
     def validate(self, data):
         members = data.get("members", [])
         leader = data.get("leader", None)
@@ -48,6 +48,21 @@ class TeamSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("the leader need to be a team member")
 
         return data
+      
+
+
+class CompetitionPhaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompetitionPhase
+        fields = ['id', 'competition', 'name', 'start_date', 'end_date']
+
+class CompetitionSerializer(serializers.ModelSerializer):
+    phases = CompetitionPhaseSerializer(many=True, read_only=True, source='competitionphase_set')
+    
+    class Meta:
+        model = Competition
+        fields = ['id', 'name', 'description', 'status', 'inscription_start', 
+                  'inscription_end', 'partners', 'phases']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -87,3 +102,4 @@ class RegisterSerializer(serializers.ModelSerializer):
             fail_silently=False,
         )
         return user
+

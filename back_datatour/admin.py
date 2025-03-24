@@ -1,8 +1,11 @@
 from django.contrib import admin
 
-from back_datatour.models import Users, Team, Country
+from back_datatour.models import Users, Team, Partner, Country
+
 
 # Register your models here.
 admin.site.register(Users)
 admin.site.register(Team)
+admin.site.register(Partner)
 admin.site.register(Country)
+

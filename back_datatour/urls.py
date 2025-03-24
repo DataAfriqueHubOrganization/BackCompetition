@@ -1,8 +1,15 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.routers import DefaultRouter
+
+# Initialiser le router
+router = DefaultRouter()
+router.register(r'competitions', CompetitionViewSet)
+router.register(r'phases', CompetitionPhaseViewSet)
+
 
 urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='register'),
@@ -19,5 +26,7 @@ urlpatterns = [
     path("partners/<int:pk>", PartnerDetail.as_view(), name='partner_detail'),
     path("teams", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
     path("teams/<int:pk>", TeamDetail.as_view(), name="team_detail"),
+  
+    path('', include(router.urls)),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

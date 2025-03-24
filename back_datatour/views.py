@@ -1,4 +1,3 @@
-
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
@@ -8,7 +7,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from rest_framework import status, permissions
+from rest_framework import status, permissions, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 
@@ -25,6 +24,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 ###################################################################################
 ##                               REGISTER                                         #
 ###################################################################################
+
 
 User = get_user_model()
 
@@ -365,3 +365,11 @@ class DeactivateAccountView(APIView):
             fail_silently=False,
         )
         return Response({"message": "Compte désactivé avec succès."}, status=status.HTTP_200_OK)
+      
+class CompetitionViewSet(viewsets.ModelViewSet):
+    queryset = Competition.objects.all()
+    serializer_class = CompetitionSerializer
+
+class CompetitionPhaseViewSet(viewsets.ModelViewSet):
+    queryset = CompetitionPhase.objects.all()
+    serializer_class = CompetitionPhaseSerializer
