@@ -1,9 +1,8 @@
 from django.urls import path
-#from back_datatour.views import UserRegister, ListOrCreatePartner, PartnerDetail, ListOrCreateTeam, TeamDetail
-
 from .views import *
-
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='register'),
@@ -14,10 +13,6 @@ urlpatterns = [
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('reset-password/<uidb64>/<token>/', ResetPasswordView.as_view(), name='reset_password'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
-  
-    path("partners", ListOrCreatePartner.as_view(), name='list_or_create_partners'),
-    path("partners/<int:pk>", PartnerDetail.as_view(), name='partner_detail'),
-    path("teams", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
-    path("teams/<int:pk>", TeamDetail.as_view(), name="team_detail"),
-]
+    path('deactivate-account/', DeactivateAccountView.as_view(), name='deactivate-account'),
 
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
