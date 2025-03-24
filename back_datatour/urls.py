@@ -14,6 +14,10 @@ urlpatterns = [
     path('reset-password/<uidb64>/<token>/', ResetPasswordView.as_view(), name='reset_password'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('deactivate-account/', DeactivateAccountView.as_view(), name='deactivate-account'),
-    path()
+    
+    path("partners", ListOrCreatePartner.as_view(), name='list_or_create_partners'),
+    path("partners/<int:pk>", PartnerDetail.as_view(), name='partner_detail'),
+    path("teams", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
+    path("teams/<int:pk>", TeamDetail.as_view(), name="team_detail"),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
