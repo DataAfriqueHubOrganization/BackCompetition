@@ -1,31 +1,54 @@
 from rest_framework import serializers
-
-from back_datatour.models import Users
-from .models import Competition, CompetitionPhase
-from allauth.account.models import EmailAddress 
+from rest_framework.exceptions import ValidationError
 
 
-class UsersRegisterSerializer(serializers.ModelSerializer):
+from back_datatour.models import Users, Partner, Team
+from allauth.account.models import EmailAddress
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import *
+
+# class RegisterSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True)
+
+class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Users
+        model = Partner
         fields = [
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'gender',
-            'country',
-            'phone',
-            'is_admin',
-            'residence_country',
-            'profession'
+            'name',
+            'description',
+            'logo',
+            'website_url'
         ]
 
-    # def create(self, validated_data):
-    #     user = Users.objects.create_user(**validated_data)
-    #     EmailAddress.objects.create(user=user, email=validated_data['email'], verified=False)
-    #
-    #     return user
+
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = [
+            'name',
+            'country',
+            'members',
+            'leader',
+        ]
+    def validate(self, data):
+        members = data.get("members", [])
+        leader = data.get("leader", None)
+
+        if self.instance:
+            members = members or self.instance.members.all()
+
+        if len(members) != 3:
+            raise serializers.ValidationError("A team should have exactly 3 members")
+
+        if not leader:
+            raise serializers.ValidationError("A leader for the team is required")
+
+        if leader and leader not in members:
+            raise serializers.ValidationError("the leader need to be a team member")
+
+        return data
+      
 
 
 class CompetitionPhaseSerializer(serializers.ModelSerializer):
@@ -40,4 +63,43 @@ class CompetitionSerializer(serializers.ModelSerializer):
         model = Competition
         fields = ['id', 'name', 'description', 'status', 'inscription_start', 
                   'inscription_end', 'partners', 'phases']
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
+        # fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone", "logo"]
+
+    def validate_email(self, value):
+        """ Vérifier que l'email est unique """
+        if Users.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Cet email est déjà utilisé.")
+        return value
+
+    def create(self, validated_data):
+        # Récupérer et supprimer le mot de passe avant d'instancier l'objet
+        password = validated_data.pop("password")  
+
+        # Créer l'utilisateur sans mot de passe
+        user = Users(**validated_data)
+        user.is_verified = False
+        user.generate_verification_token()
+
+        # Hasher le mot de passe avant d'enregistrer
+        user.set_password(password)  
+
+        # Sauvegarder l'utilisateur
+        user.save()
+
+        # Envoyer l'email de vérification (optionnel)
+        verification_link = f"http://127.0.0.1:8000/back_datatour/auth/verify-email/{user.verification_token}/"
+        send_mail(
+            subject="Vérification de votre compte",
+            message=f"Cliquez sur ce lien pour vérifier votre compte : {verification_link}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        return user
 

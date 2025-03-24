@@ -1,17 +1,32 @@
 from django.urls import path, include
-from back_datatour.views import UserRegister
+from .views import *
+from rest_framework_simplejwt.views import TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from .views import CompetitionViewSet, CompetitionPhaseViewSet
 
 # Initialiser le router
 router = DefaultRouter()
 router.register(r'competitions', CompetitionViewSet)
 router.register(r'phases', CompetitionPhaseViewSet)
 
+
 urlpatterns = [
-    # Route existante
-    path("register/", UserRegister.as_view(), name='users_register'),
+    path('auth/register/', RegisterView.as_view(), name='register'),
+    path('auth/verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
     
-    # Routes API
-    path('', include(router.urls)),  # Notez que j'ai supprimé 'api/' ici
-]
+    path('login/', LoginView.as_view(), name='login'),  # API de login
+    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # API de refresh de token
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('reset-password/<uidb64>/<token>/', ResetPasswordView.as_view(), name='reset_password'),
+    path('change-password/', ChangePasswordView.as_view(), name='change_password'),
+    path('deactivate-account/', DeactivateAccountView.as_view(), name='deactivate-account'),
+    
+    path("partners", ListOrCreatePartner.as_view(), name='list_or_create_partners'),
+    path("partners/<int:pk>", PartnerDetail.as_view(), name='partner_detail'),
+    path("teams", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
+    path("teams/<int:pk>", TeamDetail.as_view(), name="team_detail"),
+  
+    path('', include(router.urls)),
+
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
