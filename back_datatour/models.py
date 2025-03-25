@@ -93,7 +93,9 @@ class Leaderboard(TimeStampedModel):
 class Dataset(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    dataset_url = models.CharField(max_length=255)
+    dataset_train = models.FileField(upload_to="static/dataset_train/")
+    dataset_test = models.FileField(upload_to="static/dataset_test/")
+    dataset_submission = models.FileField(upload_to="static/dataset_submission/")
 
 
 class Challenge(TimeStampedModel):

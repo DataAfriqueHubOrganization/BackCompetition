@@ -21,6 +21,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+from rest_framework.parsers import MultiPartParser, FormParser
+
 ###################################################################################
 ##                               REGISTER                                         #
 ###################################################################################
@@ -32,6 +37,7 @@ User = get_user_model()
 class RegisterView(APIView):
     permission_classes = [AllowAny]  
     #  parser_classes = (MultiPartParser, FormParser)  # Gérer les fichiers uploadés
+   
     def post(self, request):
         # serializer = RegisterSerializer(data=request.data, files=request.FILES)  # Inclure les fichiers
         serializer = RegisterSerializer(data=request.data)
@@ -265,7 +271,12 @@ class ListOrCreatePartner(APIView):
 
         serializer = PartnerSerializer(partners, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+    
+    @swagger_auto_schema(
+        operation_description="Créer un nouveau partenaire",
+        request_body=PartnerSerializer,
+        responses={201: PartnerSerializer, 400: "Erreur de validation"}
+    )
     def post(self, request):
         partner = PartnerSerializer(data=request.data)
         if partner.is_valid():
@@ -288,7 +299,12 @@ class PartnerDetail(APIView):
             serializer.data,
             status=status.HTTP_200_OK
         )
-
+    
+    @swagger_auto_schema(
+        operation_description="Mettre à jour un partenaire",
+        request_body=PartnerSerializer,
+        responses={200: PartnerSerializer, 404: "Partenaire non trouvé"},
+    )
     def put(self, request, pk):
         partner = get_object_or_404(Partner, pk=pk)
         serializer = PartnerSerializer(
@@ -394,9 +410,20 @@ class CountryViewSet(viewsets.ModelViewSet):
 ##                                DATASETS                                      #
 ###################################################################################
 class DatasetViewSet(viewsets.ModelViewSet):
-    queryset = Dataset.objects.all()
     serializer_class = DatasetSerializer
     permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser] 
+
+    def get_queryset(self):
+        return Dataset.objects.all()
+    
+    @swagger_auto_schema(
+        operation_description="Uploader les datasets de la compétition",
+        request_body=DatasetSerializer,  # 🔥 Bien préciser le bon serializer
+        responses={201: "Upload réussi", 400: "Erreur de validation"}
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
 ###################################################################################
 ##                                CHALLENGE                                       #
@@ -404,4 +431,43 @@ class DatasetViewSet(viewsets.ModelViewSet):
 class ChallengeViewSet(viewsets.ModelViewSet):
     queryset = Challenge.objects.all()
     serializer_class = ChallengeSerializer
+    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser] 
+    
+    def get_queryset(self):
+        return Challenge.objects.all()
+    
+    @swagger_auto_schema(
+        operation_description="Gestion des challenges",
+        request_body=ChallengeSerializer,  
+        responses={201: "Réussi", 400: "Erreur de validation"}
+    )   
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+###################################################################################
+##                               SUBMISSION                                      #
+###################################################################################
+class SubmissionViewSet(viewsets.ModelViewSet):
+    serializer_class = SubmissionSerializer
+    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser] 
+
+    def get_queryset(self):
+        return Submission.objects.all()
+
+    @swagger_auto_schema(
+        operation_description="Uploader une soumission",
+        request_body=SubmissionSerializer,  
+        responses={201: "Upload réussi", 400: "Erreur de validation"}
+    )   
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+###################################################################################
+##                               LEADERBORD                                       #
+###################################################################################
+
+class LeaderboardViewSet(viewsets.ModelViewSet):
+    queryset = Leaderboard.objects.all()
+    serializer_class = LeaderboardSerializer
     permission_classes = [permissions.AllowAny]
