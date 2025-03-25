@@ -50,21 +50,6 @@ class TeamSerializer(serializers.ModelSerializer):
         return data
       
 
-
-class CompetitionPhaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CompetitionPhase
-        fields = ['id', 'competition', 'name', 'start_date', 'end_date']
-
-class CompetitionSerializer(serializers.ModelSerializer):
-    phases = CompetitionPhaseSerializer(many=True, read_only=True, source='competitionphase_set')
-    
-    class Meta:
-        model = Competition
-        fields = ['id', 'name', 'description', 'status', 'inscription_start', 
-                  'inscription_end', 'partners', 'phases']
-
-
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
@@ -108,5 +93,36 @@ class CountrySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Country
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at')
+
+class CompetitionPhaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompetitionPhase
+        fields = ['id', 'competition', 'name', 'start_date', 'end_date']
+
+class CompetitionSerializer(serializers.ModelSerializer):
+    phases = CompetitionPhaseSerializer(many=True, read_only=True, source='competitionphase_set')
+    
+    class Meta:
+        model = Competition
+        fields = ['id', 'name', 'description', 'status', 'inscription_start', 
+                  'inscription_end', 'partners', 'phases']
+
+class DatasetSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(format='hex_verbose', read_only=True)
+    
+    class Meta:
+        model = Dataset
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at')
+
+class ChallengeSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(format='hex_verbose', read_only=True)
+    competition_phase = serializers.SlugRelatedField(queryset=CompetitionPhase.objects.all(), slug_field='name')
+    dataset_urls = serializers.SlugRelatedField(many=True, queryset=Dataset.objects.all(), slug_field='name')
+    
+    class Meta:
+        model = Challenge
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'updated_at')

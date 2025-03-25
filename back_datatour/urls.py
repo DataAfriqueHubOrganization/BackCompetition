@@ -10,7 +10,8 @@ router = DefaultRouter()
 router.register(r'countries', CountryViewSet)
 router.register(r'competitions', CompetitionViewSet)
 router.register(r'phases', CompetitionPhaseViewSet)
-
+router.register(r'datasets', DatasetViewSet)
+router.register(r'challenges', ChallengeViewSet)
 
 urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='register'),
