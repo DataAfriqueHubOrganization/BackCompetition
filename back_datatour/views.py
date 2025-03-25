@@ -373,3 +373,8 @@ class CompetitionViewSet(viewsets.ModelViewSet):
 class CompetitionPhaseViewSet(viewsets.ModelViewSet):
     queryset = CompetitionPhase.objects.all()
     serializer_class = CompetitionPhaseSerializer
+
+class CountryViewSet(viewsets.ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    permission_classes = [permissions.AllowAny]

@@ -60,7 +60,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Les vues seront protégées par défaut
+        # 'rest_framework.permissions.IsAuthenticated',  # Les vues seront protégées par défaut
+        'rest_framework.permissions.AllowAny',  # Les vues seront protégées par défaut
     ],
 }
 

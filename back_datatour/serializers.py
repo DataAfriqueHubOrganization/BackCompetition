@@ -103,3 +103,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+class CountrySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(format='hex_verbose', read_only=True)
+    
+    class Meta:
+        model = Country
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at')
