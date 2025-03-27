@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
+import uuid
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -11,9 +12,11 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 class Country(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
 
 class Users(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     gender = models.CharField(
         max_length=10,
         choices=[("m", "m"), ("f", "f")],
@@ -23,6 +26,7 @@ class Users(AbstractUser):
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, related_name="country")
     residence_country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True,
                                           related_name="resident")
+    # logo = models.ImageField(upload_to="logos/", null=True, blank=True)  # Stocke les logos dans le dossier "logos/"
     profession = models.CharField(max_length=255)
     phone = models.CharField(max_length=50)
     is_admin = models.BooleanField(default=False)
@@ -39,11 +43,19 @@ class Team(TimeStampedModel):
     name = models.CharField(max_length=255)
     country = models.ForeignKey(Country, on_delete=models.PROTECT)
     members = models.ManyToManyField(Users, related_name="teams")
-    leader = models.ForeignKey(Users, on_delete=models.PROTECT, null=True, blank=True, related_name="led_teams")  # Leader de l'équipe
+    leader = models.ForeignKey(
+        Users,
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name="led_teams"
+    )  # Leader de l'équipe
+
 
 class Partner(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    logo = models.ImageField(upload_to='static/partners/', null=True, blank=True)
+    website_url = models.URLField(null=True, blank=True)
 
 class Competition(TimeStampedModel):
     Statut_choice = [
@@ -74,6 +86,7 @@ class CompetitionPhase(TimeStampedModel):
 
 
 class Leaderboard(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
     private_score = models.DecimalField(max_digits=20, decimal_places=10)
@@ -82,12 +95,16 @@ class Leaderboard(TimeStampedModel):
 
 
 class Dataset(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    dataset_url = models.CharField(max_length=255)
+    dataset_train = models.FileField(upload_to="static/dataset_train/")
+    dataset_test = models.FileField(upload_to="static/dataset_test/")
+    dataset_submission = models.FileField(upload_to="static/dataset_submission/")
 
 
 class Challenge(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
@@ -95,6 +112,7 @@ class Challenge(TimeStampedModel):
 
 
 class Submission(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="submissions")
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, related_name="submissions")
     file = models.FileField(upload_to="static/submissions/")
@@ -102,12 +120,14 @@ class Submission(TimeStampedModel):
 
 
 class Comment(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_comment")
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, related_name="competition_phase")
     content = models.TextField()
 
 
 class Announcement(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_announcement")
     name = models.CharField(max_length=255)
     description = models.TextField()
