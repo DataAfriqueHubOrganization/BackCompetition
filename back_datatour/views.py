@@ -7,12 +7,13 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from rest_framework import status, permissions, viewsets
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import status, permissions, viewsets, generics
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.renderers import JSONRenderer
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import *
 from .serializers import *
@@ -196,6 +197,7 @@ class ChangePasswordView(APIView):
                 {"error": "Les deux champs (ancien mot de passe et nouveau mot de passe) sont requis."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
 
         if not user.check_password(old_password):
             return Response(
@@ -467,7 +469,46 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 ##                               LEADERBORD                                       #
 ###################################################################################
 
+
 class LeaderboardViewSet(viewsets.ModelViewSet):
     queryset = Leaderboard.objects.all()
     serializer_class = LeaderboardSerializer
     permission_classes = [permissions.AllowAny]
+
+
+class IsOwnerOrAdmin(BasePermission):
+    """
+    Autorise la modification ou la suppression seulement si l'utilisateur est
+    le propriétaire (champ 'users') ou un administrateur.
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        return obj.users == request.user or request.user.is_staff or request.user.is_superuser
+      
+###################################################################################
+##                                COMMENT                                       #
+###################################################################################
+
+# Pour le modèle Comment
+class CommentListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+###################################################################################
+##                                ANNOUNCEMENT                                    #
+###################################################################################
+# Pour le modèle Announcement
+class AnnouncementListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
+
+class AnnouncementRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+

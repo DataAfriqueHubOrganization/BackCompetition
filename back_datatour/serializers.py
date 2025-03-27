@@ -149,3 +149,14 @@ class LeaderboardSerializer(serializers.ModelSerializer):
         model = Leaderboard
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'updated_at')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'users', 'compétition_phase', 'content', 'created_at', 'updated_at']
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = ['id', 'users', 'name', 'description', 'created_at', 'updated_at']

@@ -16,7 +16,16 @@ router.register(r'leaderboards', LeaderboardViewSet)
 router.register(r'submissions', SubmissionViewSet, basename='submission')
 
 
+from django.urls import path
+from .views import (
+    CommentListCreateAPIView,
+    CommentRetrieveUpdateDestroyAPIView,
+    AnnouncementListCreateAPIView,
+    AnnouncementRetrieveUpdateDestroyAPIView,
+)
+
 urlpatterns = [
+
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
     
@@ -31,7 +40,16 @@ urlpatterns = [
     path("partners/<int:pk>", PartnerDetail.as_view(), name='partner_detail'),
     path("teams", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
     path("teams/<int:pk>", TeamDetail.as_view(), name="team_detail"),
-  
+    
+    # Endpoints pour Comment
+    path('comments/', CommentListCreateAPIView.as_view(), name='comment-list'),
+    path('comments/<int:pk>/', CommentRetrieveUpdateDestroyAPIView.as_view(), name='comment-detail'),
+    
+    # Endpoints pour Announcement
+    path('announcements/', AnnouncementListCreateAPIView.as_view(), name='announcement-list'),
+    path('announcements/<int:pk>/', AnnouncementRetrieveUpdateDestroyAPIView.as_view(), name='announcement-detail'),
+    
     path('', include(router.urls)),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
