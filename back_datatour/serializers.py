@@ -14,27 +14,32 @@ from .models import *
 class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Partner
-        fields = [
-            'name',
-            'description',
-            'logo',
-            'website_url'
-        ]
+        fields = ['id', 'name', 'description', 'logo', 'website_url'  ]
+
+class CountrySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(format='hex_verbose', read_only=True)
+    
+    class Meta:
+        model = Country
+        fields = ['id', 'name']
 
 class UserSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+    residence_country = CountrySerializer(read_only=True)
+
     class Meta:
         model = Users
-        fields = '__all__'
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'profession', 'phone',
+                'is_admin', 'country', 'residence_country' ]
 
 class TeamSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+    members = UserSerializer(many=True, read_only=True)
+    leader = UserSerializer(read_only=True)
+
     class Meta:
         model = Team
-        fields = [
-            'name',
-            'country',
-            'members',
-            'leader',
-        ]
+        fields = ['name', 'country', 'members','leader',]
     def validate(self, data):
         members = data.get("members", [])
         leader = data.get("leader", None)
@@ -57,7 +62,7 @@ class TeamSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
+        fields = ["first_name", "last_name","username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
         # fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone", "logo"]
 
     def validate_email(self, value):
@@ -92,13 +97,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-class CountrySerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField(format='hex_verbose', read_only=True)
-    
-    class Meta:
-        model = Country
-        fields = '__all__'
-        read_only_fields = ('id', 'created_at', 'updated_at')
 
 class CompetitionPhaseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -106,6 +104,7 @@ class CompetitionPhaseSerializer(serializers.ModelSerializer):
         fields = ['id', 'competition', 'name', 'start_date', 'end_date']
 
 class CompetitionSerializer(serializers.ModelSerializer):
+    partners = PartnerSerializer(many=True, read_only=True)
     phases = CompetitionPhaseSerializer(many=True, read_only=True, source='competitionphase_set')
     
     class Meta:

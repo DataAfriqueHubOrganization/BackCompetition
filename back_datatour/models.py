@@ -17,6 +17,8 @@ class Country(TimeStampedModel):
 
 class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     gender = models.CharField(
         max_length=10,
         choices=[("m", "m"), ("f", "f")],
@@ -40,6 +42,7 @@ class Users(AbstractUser):
         self.save()
 
 class Team(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     country = models.ForeignKey(Country, on_delete=models.PROTECT)
     members = models.ManyToManyField(Users, related_name="teams")
@@ -52,12 +55,14 @@ class Team(TimeStampedModel):
 
 
 class Partner(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
     logo = models.ImageField(upload_to='static/partners/', null=True, blank=True)
     website_url = models.URLField(null=True, blank=True)
 
 class Competition(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     Statut_choice = [
         ('Comming soon', 'COMMING SOON'),
         ('Registration', 'REGISTRATION'),
@@ -79,6 +84,7 @@ class Competition(TimeStampedModel):
 
 
 class CompetitionPhase(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     start_date = models.DateTimeField()
@@ -86,6 +92,7 @@ class CompetitionPhase(TimeStampedModel):
 
 
 class Leaderboard(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
@@ -95,6 +102,7 @@ class Leaderboard(TimeStampedModel):
 
 
 class Dataset(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
