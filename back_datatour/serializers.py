@@ -21,6 +21,10 @@ class PartnerSerializer(serializers.ModelSerializer):
             'website_url'
         ]
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = '__all__'
 
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
@@ -154,7 +158,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'users', 'compétition_phase', 'content', 'created_at', 'updated_at']
+        fields = ['id', 'users', 'competition_phase', 'content', 'created_at', 'updated_at']
 
 class AnnouncementSerializer(serializers.ModelSerializer):
     class Meta:

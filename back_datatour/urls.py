@@ -16,13 +16,6 @@ router.register(r'leaderboards', LeaderboardViewSet)
 router.register(r'submissions', SubmissionViewSet, basename='submission')
 
 
-from django.urls import path
-from .views import (
-    CommentListCreateAPIView,
-    CommentRetrieveUpdateDestroyAPIView,
-    AnnouncementListCreateAPIView,
-    AnnouncementRetrieveUpdateDestroyAPIView,
-)
 
 urlpatterns = [
 
@@ -35,6 +28,9 @@ urlpatterns = [
     path('reset-password/<uidb64>/<token>/', ResetPasswordView.as_view(), name='reset_password'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('deactivate-account/', DeactivateAccountView.as_view(), name='deactivate-account'),
+
+    path("users", ListUser.as_view(), name='list_users'),
+    path("users/<int:pk>", UserDetail.as_view(), name='user_detail'),
     
     path("partners", ListOrCreatePartner.as_view(), name='list_or_create_partners'),
     path("partners/<int:pk>", PartnerDetail.as_view(), name='partner_detail'),

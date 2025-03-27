@@ -260,7 +260,64 @@ class DeactivateAccountView(APIView):
     
 
 ###################################################################################
-##                                PARTNER                                        #
+##                                USERS                                       #
+###################################################################################
+class ListUser(APIView):
+    def get(self, request):
+        users = Users.objects.all()
+        if not users.exists():
+            return Response(
+                {"message": "No users found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserDetail(APIView):
+    def get(self, request, pk):
+        user = get_object_or_404(Users, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+    
+    @swagger_auto_schema(
+        operation_description="Mettre à jour un utilisateur",
+        request_body=UserSerializer,
+        responses={200: PartnerSerializer, 404: "Utilisateur non trouvé"},
+    )
+    def put(self, request, pk):
+        user = get_object_or_404(Users, pk=pk)
+        serializer = UserSerializer(user,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, pk):
+        user = get_object_or_404(Users, pk=pk)
+        user.delete()
+        return Response(
+            {"message": "User deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+
+
+
+###################################################################################
+##                                PARTNERS                                        #
 ###################################################################################
 class ListOrCreatePartner(APIView):
     def get(self, request):

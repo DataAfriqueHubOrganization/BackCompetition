@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
+import uuid
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -11,9 +12,11 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 class Country(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
 
 class Users(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     gender = models.CharField(
         max_length=10,
         choices=[("m", "m"), ("f", "f")],
@@ -83,6 +86,7 @@ class CompetitionPhase(TimeStampedModel):
 
 
 class Leaderboard(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
     private_score = models.DecimalField(max_digits=20, decimal_places=10)
@@ -91,6 +95,7 @@ class Leaderboard(TimeStampedModel):
 
 
 class Dataset(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
     dataset_train = models.FileField(upload_to="static/dataset_train/")
@@ -99,6 +104,7 @@ class Dataset(TimeStampedModel):
 
 
 class Challenge(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
@@ -106,6 +112,7 @@ class Challenge(TimeStampedModel):
 
 
 class Submission(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="submissions")
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, related_name="submissions")
     file = models.FileField(upload_to="static/submissions/")
@@ -113,12 +120,14 @@ class Submission(TimeStampedModel):
 
 
 class Comment(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_comment")
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, related_name="competition_phase")
     content = models.TextField()
 
 
 class Announcement(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_announcement")
     name = models.CharField(max_length=255)
     description = models.TextField()
