@@ -57,10 +57,10 @@ jobs:
                 #pip install gunicorn psycopg2-binary
                 mkdir -p static
                 mkdir -p staticfiles
-                #python manage.py migrate
                 python manage.py makemigrations --merge --noinput
+                python manage.py migrate
                 python manage.py collectstatic --noinput
-                pkill -f gunicorn
+                pkill -f gunicorn || true
                 gunicorn settings.wsgi:application --bind 0.0.0.0:8000 --daemon
 
                 #uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings
