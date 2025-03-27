@@ -38,7 +38,7 @@ User = get_user_model()
 class RegisterView(APIView):
     permission_classes = [AllowAny]  
     #  parser_classes = (MultiPartParser, FormParser)  # Gérer les fichiers uploadés
-   
+
     def post(self, request):
         # serializer = RegisterSerializer(data=request.data, files=request.FILES)  # Inclure les fichiers
         serializer = RegisterSerializer(data=request.data)

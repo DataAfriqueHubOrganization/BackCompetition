@@ -30,20 +30,20 @@ urlpatterns = [
     path('deactivate-account/', DeactivateAccountView.as_view(), name='deactivate-account'),
 
     path("users", ListUser.as_view(), name='list_users'),
-    path("users/<int:pk>", UserDetail.as_view(), name='user_detail'),
+    path("users/<uuid:pk>", UserDetail.as_view(), name='user_detail'),
     
     path("partners", ListOrCreatePartner.as_view(), name='list_or_create_partners'),
-    path("partners/<int:pk>", PartnerDetail.as_view(), name='partner_detail'),
+    path("partners/<uuid:pk>", PartnerDetail.as_view(), name='partner_detail'),
     path("teams", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
-    path("teams/<int:pk>", TeamDetail.as_view(), name="team_detail"),
+    path("teams/<uuid:pk>", TeamDetail.as_view(), name="team_detail"),
     
     # Endpoints pour Comment
     path('comments/', CommentListCreateAPIView.as_view(), name='comment-list'),
-    path('comments/<int:pk>/', CommentRetrieveUpdateDestroyAPIView.as_view(), name='comment-detail'),
+    path('comments/<uuid:pk>/', CommentRetrieveUpdateDestroyAPIView.as_view(), name='comment-detail'),
     
     # Endpoints pour Announcement
     path('announcements/', AnnouncementListCreateAPIView.as_view(), name='announcement-list'),
-    path('announcements/<int:pk>/', AnnouncementRetrieveUpdateDestroyAPIView.as_view(), name='announcement-detail'),
+    path('announcements/<uuid:pk>/', AnnouncementRetrieveUpdateDestroyAPIView.as_view(), name='announcement-detail'),
     
     path('', include(router.urls)),
 
