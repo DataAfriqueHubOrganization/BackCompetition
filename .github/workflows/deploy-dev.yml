@@ -57,8 +57,9 @@ jobs:
                 #mkdir static
                 #python manage.py migrate
                 python manage.py makemigrations --merge --noinput
-                #python manage.py collectstatic --noinput
-                #gunicorn back_datatour.wsgi:application --bind 0.0.0.0:8000 --daemon
+                python manage.py collectstatic --noinput
+                pkill -f gunicorn
+                gunicorn settings.wsgi:application --bind 0.0.0.0:8000 --daemon
 
                 #uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings
                 #--chdir=${{ secrets.DEPLOY_PATH }} \
