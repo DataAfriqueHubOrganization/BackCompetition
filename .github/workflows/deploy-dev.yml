@@ -5,6 +5,7 @@ on:
     branches:
       - development # Trigger only on the main branch
 
+
 #permissions:
 #  contents: read
 
