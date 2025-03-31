@@ -29,8 +29,8 @@ class Users(AbstractUser):
     residence_country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True,
                                           related_name="resident")
     # logo = models.ImageField(upload_to="logos/", null=True, blank=True)  # Stocke les logos dans le dossier "logos/"
-    profession = models.CharField(max_length=255)
-    phone = models.CharField(max_length=50)
+    profession = models.CharField(max_length=255, null=True)
+    phone = models.CharField(max_length=50, null=True)
     is_admin = models.BooleanField(default=False)
     status = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
