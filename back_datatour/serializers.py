@@ -1,10 +1,11 @@
+from allauth.account.models import EmailAddress
+from django.conf import settings
+from django.core.mail import send_mail
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from back_datatour.models import Users, Partner, Team
-from allauth.account.models import EmailAddress
-from django.core.mail import send_mail
-from django.conf import settings
+from back_datatour.models import Partner, Team, Users
+
 from .models import *
 
 # class RegisterSerializer(serializers.ModelSerializer):
@@ -53,7 +54,7 @@ class TeamSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
+        fields = ["first_name","last_name","username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
         # fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone", "logo"]
 
     def validate_email(self, value):
