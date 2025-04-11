@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - development # Trigger only on the main branch
+  pull_request:
+    branches:
+      - development
 
 
 #permissions:
@@ -54,17 +57,17 @@ jobs:
                 #python -m venv venv
                 source venv/bin/activate
                 pip install -r requirements.txt
-                pip install django-cors-headers rest_framework_simplejwt djangorestframework-simplejwt
+                #pip install django-cors-headers rest_framework_simplejwt djangorestframework-simplejwt
                 #pip install gunicorn psycopg2-binary
                 mkdir -p static
                 mkdir -p staticfiles
-                python manage.py makemigrations --noinput
-                python manage.py migrate
-                python manage.py collectstatic --noinput
-                set +e
-                pkill -f gunicorn || echo "gunicorn not running"
-                set -e
-                gunicorn settings.wsgi:application --bind 0.0.0.0:8000 --daemon --reload
+                python3 manage.py makemigrations --noinput
+                python3 manage.py migrate
+                python3 manage.py collectstatic --noinput
+                #set +e
+                #pkill -f gunicorn || echo "gunicorn not running"
+                #set -e
+                #gunicorn settings.wsgi:application --bind 0.0.0.0:8000 --daemon --reload
 
                 #uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings
                 #--chdir=${{ secrets.DEPLOY_PATH }} \
@@ -75,4 +78,4 @@ jobs:
                 #--processes=5 \                 
                 #--uid=1000 --gid=2000 \         
                 #--max-requests=5000 \           
-                #--vacuum         
+                #--vacuum
