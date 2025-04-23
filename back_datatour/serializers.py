@@ -91,6 +91,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         # Envoyer l'email de vérification (optionnel)
         verification_link = f"http://127.0.0.1:8000/back_datatour/auth/verify-email/{user.verification_token}/"
+        print(verification_link)
         send_mail(
             subject="Vérification de votre compte",
             message=f"Cliquez sur ce lien pour vérifier votre compte : {verification_link}",

@@ -45,6 +45,11 @@ urlpatterns = [
     path('announcements/', AnnouncementListCreateAPIView.as_view(), name='announcement-list'),
     path('announcements/<uuid:pk>/', AnnouncementRetrieveUpdateDestroyAPIView.as_view(), name='announcement-detail'),
     
+    ## challenge
+
+    path('challenges/', ChallengeListCreateView.as_view(), name='challenge-list-create'),
+    path('challenges/<uuid:pk>/', ChallengeDetailView.as_view(), name='challenge-detail'),
+    
     path('', include(router.urls)),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

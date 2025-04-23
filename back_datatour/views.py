@@ -503,6 +503,54 @@ class ChallengeViewSet(viewsets.ModelViewSet):
     )   
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+    
+    
+    
+from .permissions import IsAdminOrReadOnly
+
+class ChallengeListCreateView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get(self, request):
+        challenges = Challenge.objects.all()
+        serializer = ChallengeSerializer(challenges, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ChallengeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class ChallengeDetailView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_object(self, pk):
+        return get_object_or_404(Challenge, pk=pk)
+
+    def get(self, request, pk):
+        challenge = self.get_object(pk)
+        serializer = ChallengeSerializer(challenge)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        challenge = self.get_object(pk)
+        serializer = ChallengeSerializer(challenge, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        challenge = self.get_object(pk)
+        challenge.delete()
+        return Response(status=204)
+    
+    
+    
+    
+    
 ###################################################################################
 ##                               SUBMISSION                                      #
 ###################################################################################

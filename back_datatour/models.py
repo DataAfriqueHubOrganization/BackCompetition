@@ -89,7 +89,12 @@ class CompetitionPhase(TimeStampedModel):
     name = models.CharField(max_length=255)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+    @property
+    def is_finished(self):
+        return timezone.now() > self.end_date
 
+    def __str__(self):
+        return self.name
 
 class Leaderboard(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -117,7 +122,11 @@ class Challenge(TimeStampedModel):
     description = models.TextField()
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
     dataset_urls = models.ManyToManyField(Dataset, related_name="dataset")
+    def is_active(self):
+        return not self.competition_phase.is_finished
 
+    def __str__(self):
+        return self.name
 
 class Submission(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
