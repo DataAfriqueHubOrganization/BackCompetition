@@ -1,4 +1,3 @@
-
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
@@ -8,12 +7,13 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from rest_framework import status, permissions
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import status, permissions, viewsets, generics
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.renderers import JSONRenderer
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import *
 from .serializers import *
@@ -22,9 +22,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+from rest_framework.parsers import MultiPartParser, FormParser
+
 ###################################################################################
 ##                               REGISTER                                         #
 ###################################################################################
+
 
 User = get_user_model()
 
@@ -32,6 +38,7 @@ User = get_user_model()
 class RegisterView(APIView):
     permission_classes = [AllowAny]  
     #  parser_classes = (MultiPartParser, FormParser)  # Gérer les fichiers uploadés
+
     def post(self, request):
         # serializer = RegisterSerializer(data=request.data, files=request.FILES)  # Inclure les fichiers
         serializer = RegisterSerializer(data=request.data)
@@ -39,122 +46,6 @@ class RegisterView(APIView):
             serializer.save()
             return Response({"message": "Inscription réussie, vérifiez votre email."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-###################################################################################
-##                                PARTNER                                        #
-###################################################################################
-class ListOrCreatePartner(APIView):
-    def get(self, request):
-        partners = Partner.objects.all()
-        if not partners.exists():
-            return Response(
-                {"message": "No partners found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        serializer = PartnerSerializer(partners, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        partner = PartnerSerializer(data=request.data)
-        if partner.is_valid():
-            partner.save()
-            return Response(
-                partner.data,
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            partner.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-
-class PartnerDetail(APIView):
-    def get(self, request, pk):
-        partner = get_object_or_404(Partner, pk=pk)
-        serializer = PartnerSerializer(partner)
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-        )
-
-    def put(self, request, pk):
-        partner = get_object_or_404(Partner, pk=pk)
-        serializer = PartnerSerializer(
-            partner,
-            data=request.data,
-            partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data,
-                status=status.HTTP_200_OK
-            )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    def delete(self, request, pk):
-        partner = get_object_or_404(Partner, pk=pk)
-        partner.delete()
-        return Response(
-            {"message": "Partner deleted successfully."},
-            status=status.HTTP_204_NO_CONTENT
-        )
-
-###################################################################################
-##                                TEAM                                       #
-###################################################################################
-class ListOrCreateTeam(APIView):
-    def get(self, request):
-        teams = Team.objects.all()
-        if not teams.exists():
-            return Response(
-                {"message": "No teams found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        serializer = TeamSerializer(teams, many=True)
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-        )
-
-    def post(self, request):
-        serializer = TeamSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-class TeamDetail(APIView):
-    def get(self, request, pk):
-        team = get_object_or_404(Team, pk=pk)
-        serializer = TeamSerializer(team)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, pk):
-        team = get_object_or_404(Team, pk=pk)
-        serializer = TeamSerializer(team, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        team = get_object_or_404(Team, pk=pk)
-        team.delete()
-        return Response({"message": "Team deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 ############## EMAIL VERIFY
 class VerifyEmailView(APIView):
@@ -307,6 +198,7 @@ class ChangePasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
         if not user.check_password(old_password):
             return Response(
                 {"error": "L'ancien mot de passe est incorrect."},
@@ -365,3 +257,315 @@ class DeactivateAccountView(APIView):
             fail_silently=False,
         )
         return Response({"message": "Compte désactivé avec succès."}, status=status.HTTP_200_OK)
+    
+
+###################################################################################
+##                                USERS                                       #
+###################################################################################
+class ListUser(APIView):
+    def get(self, request):
+        users = Users.objects.all()
+        if not users.exists():
+            return Response(
+                {"message": "No users found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserDetail(APIView):
+    def get(self, request, pk):
+        user = get_object_or_404(Users, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+    
+    @swagger_auto_schema(
+        operation_description="Mettre à jour un utilisateur",
+        request_body=UserSerializer,
+        responses={200: PartnerSerializer, 404: "Utilisateur non trouvé"},
+    )
+    def put(self, request, pk):
+        user = get_object_or_404(Users, pk=pk)
+        serializer = UserSerializer(user,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, pk):
+        user = get_object_or_404(Users, pk=pk)
+        user.delete()
+        return Response(
+            {"message": "User deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+
+
+
+###################################################################################
+##                                PARTNERS                                        #
+###################################################################################
+class ListOrCreatePartner(APIView):
+    def get(self, request):
+        partners = Partner.objects.all()
+        if not partners.exists():
+            return Response(
+                {"message": "No partners found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = PartnerSerializer(partners, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @swagger_auto_schema(
+        operation_description="Créer un nouveau partenaire",
+        request_body=PartnerSerializer,
+        responses={201: PartnerSerializer, 400: "Erreur de validation"}
+    )
+    def post(self, request):
+        partner = PartnerSerializer(data=request.data)
+        if partner.is_valid():
+            partner.save()
+            return Response(
+                partner.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            partner.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class PartnerDetail(APIView):
+    def get(self, request, pk):
+        partner = get_object_or_404(Partner, pk=pk)
+        serializer = PartnerSerializer(partner)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+    
+    @swagger_auto_schema(
+        operation_description="Mettre à jour un partenaire",
+        request_body=PartnerSerializer,
+        responses={200: PartnerSerializer, 404: "Partenaire non trouvé"},
+    )
+    def put(self, request, pk):
+        partner = get_object_or_404(Partner, pk=pk)
+        serializer = PartnerSerializer(
+            partner,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, pk):
+        partner = get_object_or_404(Partner, pk=pk)
+        partner.delete()
+        return Response(
+            {"message": "Partner deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+###################################################################################
+##                                TEAM                                       #
+###################################################################################
+class ListOrCreateTeam(APIView):
+    def get(self, request):
+        teams = Team.objects.all()
+        if not teams.exists():
+            return Response(
+                {"message": "No teams found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = TeamSerializer(teams, many=True)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        serializer = TeamSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+class TeamDetail(APIView):
+    def get(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        serializer = TeamSerializer(team)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        serializer = TeamSerializer(team, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        team.delete()
+        return Response({"message": "Team deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+###################################################################################
+##                               COMPETITION                                       #
+###################################################################################
+class CompetitionViewSet(viewsets.ModelViewSet):
+    queryset = Competition.objects.all()
+    serializer_class = CompetitionSerializer
+
+
+###################################################################################
+##                            COMPETITIONS PHASES                                 #
+###################################################################################
+
+class CompetitionPhaseViewSet(viewsets.ModelViewSet):
+    queryset = CompetitionPhase.objects.all()
+    serializer_class = CompetitionPhaseSerializer
+
+###################################################################################
+##                                COUNTRIES                                        #
+###################################################################################
+
+class CountryViewSet(viewsets.ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    permission_classes = [permissions.AllowAny]
+
+###################################################################################
+##                                DATASETS                                      #
+###################################################################################
+class DatasetViewSet(viewsets.ModelViewSet):
+    serializer_class = DatasetSerializer
+    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser] 
+
+    def get_queryset(self):
+        return Dataset.objects.all()
+    
+    @swagger_auto_schema(
+        operation_description="Uploader les datasets de la compétition",
+        request_body=DatasetSerializer,  # 🔥 Bien préciser le bon serializer
+        responses={201: "Upload réussi", 400: "Erreur de validation"}
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+###################################################################################
+##                                CHALLENGE                                       #
+###################################################################################
+class ChallengeViewSet(viewsets.ModelViewSet):
+    queryset = Challenge.objects.all()
+    serializer_class = ChallengeSerializer
+    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser] 
+    
+    def get_queryset(self):
+        return Challenge.objects.all()
+    
+    @swagger_auto_schema(
+        operation_description="Gestion des challenges",
+        request_body=ChallengeSerializer,  
+        responses={201: "Réussi", 400: "Erreur de validation"}
+    )   
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+###################################################################################
+##                               SUBMISSION                                      #
+###################################################################################
+class SubmissionViewSet(viewsets.ModelViewSet):
+    serializer_class = SubmissionSerializer
+    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser] 
+
+    def get_queryset(self):
+        return Submission.objects.all()
+
+    @swagger_auto_schema(
+        operation_description="Uploader une soumission",
+        request_body=SubmissionSerializer,  
+        responses={201: "Upload réussi", 400: "Erreur de validation"}
+    )   
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+###################################################################################
+##                               LEADERBORD                                       #
+###################################################################################
+
+
+class LeaderboardViewSet(viewsets.ModelViewSet):
+    queryset = Leaderboard.objects.all()
+    serializer_class = LeaderboardSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class IsOwnerOrAdmin(BasePermission):
+    """
+    Autorise la modification ou la suppression seulement si l'utilisateur est
+    le propriétaire (champ 'users') ou un administrateur.
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        return obj.users == request.user or request.user.is_staff or request.user.is_superuser
+      
+###################################################################################
+##                                COMMENT                                       #
+###################################################################################
+
+# Pour le modèle Comment
+class CommentListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+###################################################################################
+##                                ANNOUNCEMENT                                    #
+###################################################################################
+# Pour le modèle Announcement
+class AnnouncementListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
+
+class AnnouncementRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+
