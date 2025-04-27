@@ -98,28 +98,28 @@ class CompetitionPhase(TimeStampedModel):
 
 class Leaderboard(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
     private_score = models.DecimalField(max_digits=20, decimal_places=10)
     public_score = models.DecimalField(max_digits=20, decimal_places=10)
     rank = models.PositiveIntegerField()
 
-
-class Dataset(TimeStampedModel):
+class DatasetFile(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    dataseturl = models.CharField(max_length=255)
+    description = models.JSONField()
+class Dataset(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    dataset_train = models.FileField(upload_to="static/dataset_train/")
-    dataset_test = models.FileField(upload_to="static/dataset_test/")
-    dataset_submission = models.FileField(upload_to="static/dataset_submission/")
-
+    Dataset_file = models.ManyToManyField(DatasetFile, related_name ="dataset")
+  
 
 class Challenge(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    # description = models.TextField()
+    description  = models.JSONField(default = dict) ## on stcokera un json
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
     dataset_urls = models.ManyToManyField(Dataset, related_name="dataset")
     def is_active(self):
