@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     "back_datatour",
+    "auth_user"
     'rest_framework.authtoken',  
     'corsheaders',
     'drf_yasg',  
