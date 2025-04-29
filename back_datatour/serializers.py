@@ -110,6 +110,8 @@ class CompetitionPhaseSerializer(serializers.ModelSerializer):
 
 
 class CompetitionSerializer(serializers.ModelSerializer):
+    partners = PartnerSerializer(many=True, read_only=True)
+
     class Meta:
         model = Competition
         fields = [
@@ -121,6 +123,7 @@ class CompetitionSerializer(serializers.ModelSerializer):
             'inscription_end',
             'partners'
         ]
+        read_only_fields = ['id']
 
 
 class DatasetSerializer(serializers.ModelSerializer):

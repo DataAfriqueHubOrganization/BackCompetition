@@ -8,7 +8,6 @@ from rest_framework.routers import DefaultRouter
 # Initialiser le router
 router = DefaultRouter()
 router.register(r'countries', CountryViewSet)
-router.register(r'competitions', CompetitionViewSet)
 router.register(r'phases', CompetitionPhaseViewSet)
 router.register(r'datasets', DatasetViewSet, basename='dataset')
 router.register(r'challenges', ChallengeViewSet, basename='challenge')
@@ -46,6 +45,10 @@ urlpatterns = [
     path('announcements/<uuid:pk>/', AnnouncementRetrieveUpdateDestroyAPIView.as_view(), name='announcement-detail'),
 
     path('countries/<str:name>/', CountryView.as_view(), name='country_detail'),
+
+    path('competitions/', CompetitionListView.as_view(), name='competition-list'),
+    path('competitions/create/', CompetitionCreateView.as_view(), name='competition-create'),
+    path('competitions/<uuid:pk>/', CompetitionUpdateDeleteView.as_view(), name='competition-detail'),
     
     path('', include(router.urls)),
 

@@ -445,9 +445,25 @@ class TeamDetail(APIView):
 ###################################################################################
 ##                               COMPETITION                                       #
 ###################################################################################
-class CompetitionViewSet(viewsets.ModelViewSet):
+class CompetitionListView(generics.ListAPIView):
+    queryset = Competition.objects.all().order_by('-created_at')
+    serializer_class = CompetitionSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class CompetitionCreateView(generics.CreateAPIView):
     queryset = Competition.objects.all()
     serializer_class = CompetitionSerializer
+    # Uncomment the following line for deployment
+    #permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+
+class CompetitionUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Competition.objects.all()
+    serializer_class = CompetitionSerializer
+    lookup_field = 'pk'
+    # Uncomment the following lines for deployment
+    #permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
 
 ###################################################################################
