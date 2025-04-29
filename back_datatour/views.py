@@ -102,7 +102,9 @@ class LoginView(APIView):
             'access_token': access_token,
             'refresh_token': str(refresh),
             'user_id': user.id,
-            'username': user.username
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name
         }, status=status.HTTP_200_OK)
         
 ###################################################################################
@@ -464,6 +466,16 @@ class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
     permission_classes = [permissions.AllowAny]
+
+
+class CountryView(APIView):
+    def get(self, request, name):
+        country = get_object_or_404(Country, name=name)
+        serializer = CountrySerializer(country)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
 
 ###################################################################################
 ##                                DATASETS                                      #

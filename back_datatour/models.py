@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 import uuid
 
+
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -11,9 +12,11 @@ class TimeStampedModel(models.Model):
     class Meta:
         abstract = True
 
+
 class Country(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
+
 
 class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -41,6 +44,7 @@ class Users(AbstractUser):
         self.verification_token = get_random_string(64)
         self.save()
 
+
 class Team(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
@@ -60,6 +64,7 @@ class Partner(models.Model):
     description = models.TextField()
     logo = models.ImageField(upload_to='static/partners/', null=True, blank=True)
     website_url = models.URLField(null=True, blank=True)
+
 
 class Competition(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

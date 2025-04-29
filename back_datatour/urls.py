@@ -44,6 +44,8 @@ urlpatterns = [
     # Endpoints pour Announcement
     path('announcements/', AnnouncementListCreateAPIView.as_view(), name='announcement-list'),
     path('announcements/<uuid:pk>/', AnnouncementRetrieveUpdateDestroyAPIView.as_view(), name='announcement-detail'),
+
+    path('countries/<str:name>/', CountryView.as_view(), name='country_detail'),
     
     path('', include(router.urls)),
 
