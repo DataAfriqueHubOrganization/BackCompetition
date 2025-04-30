@@ -76,7 +76,10 @@ class LoginView(APIView):
             'access_token': str(refresh.access_token),
             'refresh_token': str(refresh),
             'user_id': user.id,
-            'username': user.username
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email
         }, status=status.HTTP_200_OK)
 
 ##########################################
@@ -98,7 +101,8 @@ class ForgotPasswordView(APIView):
 
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(str(user.pk).encode())
-        reset_link = f"http://{get_current_site(request).domain}/back_datatour/reset-password/{uid}/{token}/"
+        reset_link = f"http://{get_current_site(request).domain}/auth/reset-password/{uid}/{token}/"
+        print(reset_link)
 
         subject = 'Réinitialisation de votre mot de passe'
         message = f"Bonjour {user.username},\n\n" \

@@ -7,7 +7,7 @@ from rest_framework.routers import DefaultRouter
 # Initialiser le router
 router = DefaultRouter()
 router.register(r'leaderboards', LeaderboardViewSet)
-router.register(r'submissions', SubmissionViewSet, basename='submission')
+router.register(r'', SubmissionViewSet, basename='submission')
 
 
 

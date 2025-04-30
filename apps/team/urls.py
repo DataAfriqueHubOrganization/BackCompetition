@@ -9,8 +9,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
 
-    path("teams", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
-    path("teams/<uuid:pk>", TeamDetail.as_view(), name="team_detail"),
+    path("", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
+    path("<uuid:pk>", TeamDetail.as_view(), name="team_detail"),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

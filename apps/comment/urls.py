@@ -8,8 +8,8 @@ urlpatterns = [
 
     
 #     Endpoints pour Comment
-    path('comments/', CommentListCreateAPIView.as_view(), name='comment-list'),
-    path('comments/<uuid:pk>/', CommentRetrieveUpdateDestroyAPIView.as_view(), name='comment-detail'),
+    path('', CommentListCreateAPIView.as_view(), name='comment-list'),
+    path('<uuid:pk>/', CommentRetrieveUpdateDestroyAPIView.as_view(), name='comment-detail'),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

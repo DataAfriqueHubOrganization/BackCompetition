@@ -7,7 +7,7 @@ from rest_framework.routers import DefaultRouter
 
 # # Initialiser le router
 router = DefaultRouter()
-router.register(r'datasets', DatasetViewSet, basename='dataset')
+router.register(r'', DatasetViewSet, basename='dataset')
 
 
 
