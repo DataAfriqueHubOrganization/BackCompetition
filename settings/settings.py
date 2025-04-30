@@ -50,7 +50,14 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     "back_datatour",
-    "auth_user"
+    "apps.auth_user",
+    "apps.team",
+    "apps.announcement",
+    "apps.dataset",
+    "apps.partner",
+    "apps.submission",
+    "apps.competition",
+    "apps.comment",
     'rest_framework.authtoken',  
     'corsheaders',
     'drf_yasg',  
@@ -82,16 +89,12 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
-
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    
     'allauth.account.middleware.AccountMiddleware', 
-
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
@@ -126,7 +129,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-AUTH_USER_MODEL = 'back_datatour.Users'
+AUTH_USER_MODEL = 'auth_user.Users'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -190,3 +193,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
+DOMAIN_NAME = config("FRONTEND_URL")
