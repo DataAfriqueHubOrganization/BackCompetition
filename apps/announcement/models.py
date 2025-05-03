@@ -5,6 +5,6 @@ from back_datatour.models import  TimeStampedModel
 
 class Announcement(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    users = models.ForeignKey('auth_user.Users', on_delete=models.CASCADE, related_name="user_announcement")
+    user = models.ForeignKey('auth_user.Users', on_delete=models.CASCADE, related_name="user_announcement")
     name = models.CharField(max_length=255)
     description = models.TextField()

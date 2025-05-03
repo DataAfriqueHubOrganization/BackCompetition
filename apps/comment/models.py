@@ -7,7 +7,7 @@ from back_datatour.models import TimeStampedModel
 
 class Comment(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    users = models.ForeignKey('auth_user.Users', on_delete=models.CASCADE, related_name="user_comment")
+    user = models.ForeignKey('auth_user.Users', on_delete=models.CASCADE, related_name="user_comment")
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, related_name="competition_phase")
     content = models.TextField()
 
