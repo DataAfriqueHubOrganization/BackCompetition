@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    "back_datatour",
+    # "back_datatour",
     "apps.auth_user",
     "apps.team",
     "apps.announcement",

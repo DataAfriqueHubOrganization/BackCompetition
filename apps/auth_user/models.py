@@ -1,15 +1,25 @@
-from django.db import models
-
 # Create your models here.
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
-from django.utils.crypto import get_random_string
 import uuid
-from back_datatour.models import *
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
+
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.utils.crypto import get_random_string
+
+
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class Country(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 
 class Users(AbstractUser):

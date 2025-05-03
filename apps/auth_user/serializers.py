@@ -1,15 +1,17 @@
-from allauth.account.models import EmailAddress
-from django.core.mail import send_mail
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from back_datatour.serializers import CountrySerializer
-# from back_datatour.models import Partner, Team, Users
 from django.conf import settings
-from .models import *
-# from django.contrib.sites.models import Site
+from django.core.mail import send_mail
 from django.urls import reverse
-from decouple import config
- 
+from rest_framework import serializers
+
+from .models import *
+
+
+class CountrySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(format='hex_verbose', read_only=True)
+
+    class Meta:
+        model = Country
+        fields = ['id', 'name']
 
 
 class UserSerializer(serializers.ModelSerializer):

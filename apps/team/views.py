@@ -9,51 +9,43 @@ from .models import Team
 from .serializers import TeamSerializer
 
 
-###################################################################################
-#                                   TEAM                                          #
-###################################################################################
-
 class ListOrCreateTeam(APIView):
-    """
-    Liste toutes les équipes ou crée une nouvelle équipe.
-    """
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(
-        operation_description="Lister toutes les équipes.",
-        responses={200: TeamSerializer(many=True)}
-    )
-    def get(self, request):
+    def get(self, request, country_name: str = '__all__'):
         teams = Team.objects.all()
         if not teams.exists():
             return Response(
                 {"message": "No teams found."},
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_200_OK
             )
 
-        serializer = TeamSerializer(teams, many=True)
+        if country_name == '__all__':
+            serializer = TeamSerializer(teams, many=True)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        serializer = TeamSerializer(teams.filter(country=country_name), many=True)
+
         return Response(
             serializer.data,
             status=status.HTTP_200_OK
         )
 
-    @swagger_auto_schema(
-        operation_description="Créer une nouvelle équipe.",
-        request_body=TeamSerializer,
-        responses={201: TeamSerializer, 400: "Erreur de validation"}
-    )
     def post(self, request):
         serializer = TeamSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(
-                serializer.data,
+                {
+                    "message": "Team created",
+                    "name": serializer.validated_data['name']
+                },
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TeamDetail(APIView):

@@ -1,17 +1,13 @@
 from rest_framework import serializers
 
-from back_datatour.serializers import CountrySerializer
 from .models import *
-from apps.auth_user.serializers import UserSerializer
+
 
 class TeamSerializer(serializers.ModelSerializer):
-    country = CountrySerializer(read_only=True)
-    members = UserSerializer(many=True, read_only=True)
-    leader = UserSerializer(read_only=True)
-
     class Meta:
         model = Team
         fields = ['name', 'country', 'members','leader',]
+
     def validate(self, data):
         members = data.get("members", [])
         leader = data.get("leader", None)
@@ -27,6 +23,11 @@ class TeamSerializer(serializers.ModelSerializer):
 
         if leader and leader not in members:
             raise serializers.ValidationError("the leader need to be a team member")
+
+        if leader:
+            for m in members:
+                if m.country != leader.country:
+                    raise serializers.ValidationError("All members should be from the same country")
 
         return data
       

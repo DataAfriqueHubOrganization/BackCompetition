@@ -3,8 +3,7 @@ import uuid
 from django.utils import timezone
 from apps.dataset.models import  Dataset
 from apps.partner.models import Partner
-# Create your models here.
-from back_datatour.models import  TimeStampedModel
+from apps.auth_user.models import  TimeStampedModel
 
 class Competition(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
