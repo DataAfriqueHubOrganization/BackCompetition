@@ -1,12 +1,10 @@
-from django.db import models
 import uuid
-
-from apps.auth_user.models import Users
-from back_datatour.models import Country, TimeStampedModel
+from django.db import models
+from apps.auth_user.models import Country, TimeStampedModel, Users
 
 class Team(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     country = models.ForeignKey(Country, on_delete=models.PROTECT)
     members = models.ManyToManyField('auth_user.Users', related_name="teams")
     leader = models.ForeignKey(
@@ -15,7 +13,6 @@ class Team(TimeStampedModel):
         null=True, blank=True,
         related_name="led_teams"
     )  # Leader de l'équipe
-
 
 class TeamJoinRequest(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -1,8 +1,7 @@
 from django.db import models
 import uuid
-from apps.auth_user.models import Users
 from apps.competition.models import CompetitionPhase
-from back_datatour.models import TimeStampedModel
+from apps.auth_user.models import TimeStampedModel
 
 
 class Comment(TimeStampedModel):

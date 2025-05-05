@@ -22,7 +22,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("/", include('back_datatour.urls')),
+    # path("/", include('back_datatour.urls')),
     path("auth/", include('apps.auth_user.urls')),
     path("announcement/", include('apps.announcement.urls')),
     path("dataset/", include('apps.dataset.urls')),

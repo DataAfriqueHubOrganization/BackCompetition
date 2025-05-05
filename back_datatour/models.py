@@ -1,8 +1,7 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
-from django.utils.crypto import get_random_string
 import uuid
+
+from django.db import models
+
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

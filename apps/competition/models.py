@@ -3,10 +3,14 @@ import uuid
 from django.utils import timezone
 from apps.dataset.models import  Dataset
 from apps.partner.models import Partner
+<<<<<<< HEAD
 # Create your models here.
 from back_datatour.models import  TimeStampedModel
 from django.conf import settings
 from apps.team.models import Team
+=======
+from apps.auth_user.models import  TimeStampedModel
+>>>>>>> d6dd1c852d9970b57ae8a8c49ea6ec9b95d3a441
 
 class Competition(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

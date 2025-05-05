@@ -9,59 +9,42 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import get_user_model
 from utils import send_emails  
 
-###################################################################################
-#                                   TEAM                                          #
-###################################################################################
-
-
-
-User = get_user_model()
-
 class ListOrCreateTeam(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
-    @swagger_auto_schema(
-        operation_description="Lister toutes les équipes.",
-        responses={200: TeamSerializer(many=True)}
-    )
-    def get(self, request):
+    def get(self, request, country_name: str = '__all__'):
         teams = Team.objects.all()
         if not teams.exists():
             return Response(
-                {"message": "Aucune équipe trouvée."},
-                status=status.HTTP_404_NOT_FOUND
+                {"message": "No teams found."},
+                status=status.HTTP_200_OK
             )
-        serializer = TeamSerializer(teams, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        operation_description="Créer une nouvelle équipe.",
-        request_body=TeamSerializer,
-        responses={201: TeamSerializer, 400: "Erreur de validation"}
-    )
+        if country_name == '__all__':
+            serializer = TeamSerializer(teams, many=True)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        serializer = TeamSerializer(teams.filter(country=country_name), many=True)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
     def post(self, request):
         serializer = TeamSerializer(data=request.data)
         if serializer.is_valid():
-            team = serializer.save()
-
-            # Envoyer un email à chaque membre sauf le leader
-            members_ids = request.data.get("members", [])
-            leader_id = request.data.get("leader")
-
-            for member_id in members_ids:
-                if member_id != leader_id:
-                    try:
-                        user = User.objects.get(pk=member_id)
-                        send_emails(
-                            subject="Invitation à rejoindre une équipe",
-                            message=f"Bonjour {user.username},\n\nVous avez été invité à rejoindre l’équipe '{team.name}'. Connectez-vous pour accepter ou refuser cette invitation.",
-                            recipient_list=[user.email]
-                        )
-                    except User.DoesNotExist:
-                        pass  # Ignore si l'utilisateur n'existe pas
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+            serializer.save()
+            return Response(
+                {
+                    "message": "Team created",
+                    "name": serializer.validated_data['name']
+                },
+                status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -107,13 +90,12 @@ class TeamDetail(APIView):
 
 class UpdateTeamRequestStatus(APIView):
     permission_classes = [IsAuthenticated]
-
     def put(self, request, pk):
         request_join = get_object_or_404(TeamJoinRequest, pk=pk)
         team = request_join.team
 
         # Seul le leader de l'équipe peut traiter la demande
-        if request.user != team.team_leader:
+        if request.user != team.leader:
             return Response(
                 {"detail": "Vous n'êtes pas autorisé à traiter cette demande."},
                 status=status.HTTP_403_FORBIDDEN
