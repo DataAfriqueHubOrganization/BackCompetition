@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_filters",
     'rest_framework',
     'allauth',
     'allauth.account',
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  
     'corsheaders',
     'drf_yasg',  
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 

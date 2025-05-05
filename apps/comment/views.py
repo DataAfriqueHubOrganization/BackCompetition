@@ -11,11 +11,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from apps.auth_user.permissions import *
 
-###################################################################################
-#                                   COMMENT                                       #
-###################################################################################
-
-class CommentListCreateAPIView(generics.ListCreateAPIView):
+class CommentViewSet(viewsets.ModelViewSet):
     """
     GET : Liste tous les commentaires.
     POST : Crée un nouveau commentaire (seulement pour les utilisateurs authentifiés).
@@ -24,6 +20,23 @@ class CommentListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def get_permissions(self):
+        """ Assigns permissions based on action. """
+        if self.action == 'create':
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
+        else:
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        return [permission() for permission in permission_classes]
+
+    def perform_create(self, serializer):
+        """ Set the user of the comment to the logged-in user. """
+        # Le serializer ici sera CommentSerializer (grâce à get_serializer_class)
+        # Il contient competition_phase et content dans validated_data
+        serializer.save(user=self.request.user)
+
+    # --- Swagger documentation (ajustée pour request_body de update/patch) ---
     @swagger_auto_schema(
         operation_description="Lister tous les commentaires.",
         responses={200: CommentSerializer(many=True)},
@@ -35,9 +48,9 @@ class CommentListCreateAPIView(generics.ListCreateAPIView):
         return super().get(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_description="Créer un nouveau commentaire.",
-        request_body=CommentSerializer,
-        responses={201: CommentSerializer}
+        operation_description="Create a new comment...",
+        request_body=CommentSerializer, # Input utilise CommentSerializer
+        responses={201: CommentSerializer} # Réponse utilise CommentSerializer
     )
     def post(self, request, *args, **kwargs):
         """
