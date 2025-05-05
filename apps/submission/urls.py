@@ -13,4 +13,3 @@ router.register(r'', SubmissionViewSet, basename='submission')
 urlpatterns = [    
     path('', include(router.urls)),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
