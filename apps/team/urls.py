@@ -11,6 +11,7 @@ urlpatterns = [
 
     path("", ListOrCreateTeam.as_view(), name="list_or_create_teams"),
     path("<uuid:pk>", TeamDetail.as_view(), name="team_detail"),
-    
+    path('team/join-request/<int:pk>/update/', UpdateTeamRequestStatus.as_view(), name='update-team-request'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

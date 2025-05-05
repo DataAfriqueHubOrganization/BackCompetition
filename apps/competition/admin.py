@@ -6,3 +6,4 @@ from .models import *
 admin.site.register(Competition)
 admin.site.register(CompetitionPhase)
 admin.site.register(Challenge)
+admin.site.register(CompetitionParticipant)

@@ -17,7 +17,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import Users
 from .serializers import RegisterSerializer, UserSerializer
-from ..competition.permissions import IsAdminOrReadOnly
+# from ...permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly
 
 
 User = get_user_model()

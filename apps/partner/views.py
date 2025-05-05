@@ -6,8 +6,12 @@ from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 
 from .models import Partner
-from .serializers import PartnerSerializer
 
+
+from rest_framework.permissions import IsAuthenticated,AllowAny
+from .serializers import *
+from apps.auth_user.permissions import IsAdminUser
+from .serializers import PartnerSerializer
 
 ###################################################################################
 #                                 PARTNERS                                        #
@@ -50,7 +54,12 @@ class PartnerDetail(APIView):
     """
     Récupère, met à jour ou supprime un partenaire spécifique.
     """
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated(), IsAdminUser()]
+        return [AllowAny()]
+
 
     @swagger_auto_schema(
         operation_description="Récupère les détails d’un partenaire.",

@@ -5,6 +5,8 @@ from apps.dataset.models import  Dataset
 from apps.partner.models import Partner
 # Create your models here.
 from back_datatour.models import  TimeStampedModel
+from django.conf import settings
+from apps.team.models import Team
 
 class Competition(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -27,7 +29,14 @@ class Competition(TimeStampedModel):
     # price
     partners = models.ManyToManyField(Partner, related_name="partner")
 
-
+    @property
+    def inscription_finished(self):
+        return timezone.now() > self.inscription_end
+    @property
+    def inscription_not_started(self):
+        return timezone.now() < self.inscription_start
+    def __str__(self):
+        return self.name
 class CompetitionPhase(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
@@ -53,3 +62,12 @@ class Challenge(TimeStampedModel):
 
     def __str__(self):
         return self.name
+    
+class CompetitionParticipant(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'competition')  # Empêche les participations en double
