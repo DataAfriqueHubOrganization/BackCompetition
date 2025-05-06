@@ -11,28 +11,39 @@ from utils import send_emails
 
 class ListOrCreateTeam(APIView):
     permission_classes = [AllowAny]
-
     def get(self, request, country_name: str = '__all__'):
-        teams = Team.objects.all()
+        if country_name != '__all__':
+            teams = Team.objects.filter(country__name__iexact=country_name)
+        else:
+            teams = Team.objects.all()
+
         if not teams.exists():
-            return Response(
-                {"message": "No teams found."},
-                status=status.HTTP_200_OK
-            )
+            return Response({"message": "No teams found."}, status=status.HTTP_200_OK)
 
-        if country_name == '__all__':
-            serializer = TeamSerializer(teams, many=True)
-            return Response(
-                serializer.data,
-                status=status.HTTP_200_OK
-            )
+        serializer = TeamSerializer(teams, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        serializer = TeamSerializer(teams.filter(country=country_name), many=True)
+    # def get(self, request, country_name: str = '__all__'):
+    #     teams = Team.objects.all()
+    #     if not teams.exists():
+    #         return Response(
+    #             {"message": "No teams found."},
+    #             status=status.HTTP_200_OK
+    #         )
 
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-        )
+    #     if country_name == '__all__':
+    #         serializer = TeamSerializer(teams, many=True)
+    #         return Response(
+    #             serializer.data,
+    #             status=status.HTTP_200_OK
+    #         )
+
+    #     serializer = TeamSerializer(teams.filter(country=country_name), many=True)
+
+    #     return Response(
+    #         serializer.data,
+    #         status=status.HTTP_200_OK
+    #     )
 
     def post(self, request):
         serializer = TeamSerializer(data=request.data)
