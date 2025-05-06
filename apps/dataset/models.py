@@ -2,8 +2,7 @@ from django.db import models
 
 # Create your models here.
 import uuid
-<<<<<<< HEAD
-from back_datatour.models import TimeStampedModel
+from apps.auth_user.models import TimeStampedModel
 import os
 from django.utils.translation import gettext_lazy as _
 
@@ -19,9 +18,6 @@ def dataset_file_upload_path(instance, filename):
     # Utiliser le nom de fichier original stocké pour le chemin final
     final_filename = instance.original_filename or filename
     return os.path.join('datasets', str(dataset_id), file_type_folder, final_filename)
-=======
-from apps.auth_user.models import TimeStampedModel
->>>>>>> d6dd1c852d9970b57ae8a8c49ea6ec9b95d3a441
 
 
 class Dataset(TimeStampedModel):
