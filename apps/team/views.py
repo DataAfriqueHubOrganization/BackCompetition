@@ -13,7 +13,11 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 class ListOrCreateTeam(APIView):
-    permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
     def get(self, request, country_name: str = '__all__'):
         if country_name != '__all__':
             teams = Team.objects.filter(country__name__iexact=country_name)
@@ -197,7 +201,7 @@ class UpdateTeamRequestStatus(APIView):
         request_join.status = status_value
         request_join.save()
 
-        # ✅ Envoi d'email au leader
+        # Envoi d'email au leader
         send_mail(
             subject=f"Réponse à l'invitation d'équipe {team.name}",
             message=(

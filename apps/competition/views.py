@@ -9,56 +9,6 @@ from .serializers import *
 from apps.auth_user.permissions import IsAdminUser
 from utils import send_emails
 from apps.team.models import TeamJoinRequest
-###################################################################################
-#                                   CHALLENGE                                      #
-###################################################################################
-
-# class ChallengeListCreateView(APIView):
-#     """
-#     GET : Lister tous les challenges.
-#     POST : Créer un nouveau challenge (admin uniquement).
-#     """
-#     permission_classes = [IsAdminOrReadOnly]
-
-#     @swagger_auto_schema(
-#         operation_description="Récupère la liste de tous les challenges.",
-#         responses={200: ChallengeSerializer(many=True)}
-#     )
-#     def get(self, request):
-#         challenges = Challenge.objects.all()
-#         serializer = ChallengeSerializer(challenges, many=True)
-#         return Response(serializer.data)
-
-#     @swagger_auto_schema(
-#         operation_description="Crée un nouveau challenge (admin uniquement).",
-#         request_body=ChallengeSerializer,
-#         responses={201: ChallengeSerializer, 400: 'Bad Request'}
-#     )
-#     def post(self, request):
-#         serializer = ChallengeSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=201)
-#         return Response(serializer.errors, status=400)
-
-
-# class ChallengeDetailView(APIView):
-#     """
-#     GET : Récupère un challenge par ID.
-#     """
-#     permission_classes = [IsAdminOrReadOnly]
-
-#     def get_object(self, pk):
-#         return get_object_or_404(Challenge, pk=pk)
-
-#     @swagger_auto_schema(
-#         operation_description="Récupère un challenge par son ID.",
-#         responses={200: ChallengeSerializer, 404: 'Not Found'}
-#     )
-#     def get(self, request, pk):
-#         challenge = self.get_object(pk)
-#         serializer = ChallengeSerializer(challenge)
-#         return Response(serializer.data)
 
 
 ###################################################################################
@@ -196,7 +146,7 @@ class ChallengeListCreate(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ChallengeDetail(APIView):
-    # permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     def get_permissions(self):
         if self.request.method == 'put' or self.request.method == 'delete':
             return [IsAuthenticated(), IsAdminUser()]
@@ -248,7 +198,7 @@ class ParticipateInCompetition(APIView):
         team_id = request.data.get("team_id")
         print(team_id, "tttttt")
         if team_id:
-            # ✅ Rejoindre une équipe existante
+            #  Rejoindre une équipe existante
             team = get_object_or_404(Team, id=team_id)
 
             if team.members.filter(id=user.id).exists():
@@ -275,7 +225,7 @@ class ParticipateInCompetition(APIView):
                 status=status.HTTP_201_CREATED
             )
 
-        # ❌ Aucun team_id fourni et création de team non gérée ici
+        #  Aucun team_id fourni et création de team non gérée ici
         return Response(
             {"detail": "Veuillez rejoindre une équipe existante ou créer une équipe via l'API dédiée."},
             status=status.HTTP_400_BAD_REQUEST
