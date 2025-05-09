@@ -33,3 +33,54 @@ challenge
     "TEST"
   ]
 }
+
+user:{
+   "last_name": "Diop",
+"first_name": "Aminata",
+"username": "aminadiop",
+"email": "waxiw58981@javbing.com",
+"password": "test1234",
+"profession": "Développeuse",
+"phone": "+221770000001",
+"gender": "f"
+}
+
+{
+
+   
+  "last_name": "Ba",
+  "first_name": "Moussa",
+  "username": "moussaba",
+  "email": "wyk0gbd6yv@bltiwd.com",
+  "password": "test1234",
+  "profession": "Data Scientist",
+  "phone": "+221770000002",
+  "gender": "m"
+
+}
+
+{
+  "last_name": "Sarr",
+  "first_name": "Fatou",
+  "username": "fatousarr",
+  "email": "fatoufall194@gmail.com",
+  "password": "test1234",
+  "profession": "Ingénieure",
+  "phone":  "+221770000003", 
+  "gender": "f"
+}
+
+login:
+{# 9c967cce-320b-4dad-b20b-28570574f30d
+  "username ": "aminadiop",
+  "password": "test1234"
+}
+{ 46d3c77d-deac-41da-baef-997bfb963028 leader
+  "username ": "moussaba",
+  "password": "test1234"
+}
+{
+  40de63e2-f499-49f2-afc2-e665c07c467b 
+  "username ": "fatousarr",
+  "password": "test1234"
+}

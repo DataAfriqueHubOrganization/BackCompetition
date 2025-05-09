@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import *
-
+from apps.competition.models import CompetitionParticipant
+from utils import send_emails
+from rest_framework.response import Response
 # class TeamSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Team
@@ -56,17 +58,33 @@ class TeamSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         members = validated_data.pop('members', [])
         leader = validated_data.get('leader')
+        competition = self.context.get('competition')  # ✅ récupéré depuis la vue
 
-        # Ajouter le leader aux membres s'il ne l'est pas
         if leader and leader not in members:
             members.append(leader)
 
         team = Team.objects.create(**validated_data)
-        team.members.set(members)
+        team.members.set([leader])  # seul le leader devient membre tout de suite
 
-        # ✅ Envoi d'e-mails après création
+        # Créer le CompetitionParticipant pour le leader
+        CompetitionParticipant.objects.create(
+            user=leader,
+            competition=competition,
+            team=team
+        )
+
+        # Créer des invitations pour les autres membres
+        invited = [m for m in members if m != leader]
+        print(invited, "invited")
+        for user in invited:
+            TeamJoinRequest.objects.create(user=user, team=team)
+            send_emails(
+                subject="Invitation à rejoindre une équipe",
+                message=f"Vous avez été invité à rejoindre l'équipe '{team.name}' pour la compétition '{competition.name}'.",
+                recipient_list=[user.email]
+            )
+
         send_team_creation_emails(team.name, members, leader)
-
         return team
 
 

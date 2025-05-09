@@ -25,7 +25,7 @@ def send_team_creation_emails(team_name, members, leader):
             f"Bonjour {member.username},\n\n"
             f"Vous avez été ajouté à l'équipe '{team_name}'.\n"
             f"Leader de l'équipe : {leader.username}\n\n"
-            "Merci de votre participation et bonne chance pour la compétition !"
+            "Merci de confirmer votre participation et bonne chance pour la compétition !"
         )
         send_mail(
             subject,
