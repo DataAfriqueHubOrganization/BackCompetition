@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from apps.auth_user.models import Users
 from .models import *
 from .serializers import *
 
@@ -102,7 +104,9 @@ class LoginView(APIView):
             'access_token': access_token,
             'refresh_token': str(refresh),
             'user_id': user.id,
-            'username': user.username
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name
         }, status=status.HTTP_200_OK)
         
 ###################################################################################
@@ -443,9 +447,25 @@ class TeamDetail(APIView):
 ###################################################################################
 ##                               COMPETITION                                       #
 ###################################################################################
-class CompetitionViewSet(viewsets.ModelViewSet):
+class CompetitionListView(generics.ListAPIView):
+    queryset = Competition.objects.all().order_by('-created_at')
+    serializer_class = CompetitionSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class CompetitionCreateView(generics.CreateAPIView):
     queryset = Competition.objects.all()
     serializer_class = CompetitionSerializer
+    # Uncomment the following line for deployment
+    #permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+
+class CompetitionUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Competition.objects.all()
+    serializer_class = CompetitionSerializer
+    lookup_field = 'pk'
+    # Uncomment the following lines for deployment
+    #permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
 
 ###################################################################################
@@ -461,9 +481,19 @@ class CompetitionPhaseViewSet(viewsets.ModelViewSet):
 ###################################################################################
 
 class CountryViewSet(viewsets.ModelViewSet):
-    queryset = Country.objects.all()
+    queryset = Country.objects.all().order_by('name')
     serializer_class = CountrySerializer
     permission_classes = [permissions.AllowAny]
+
+
+class CountryView(APIView):
+    def get(self, request, name):
+        country = get_object_or_404(Country, name=name)
+        serializer = CountrySerializer(country)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
 
 ###################################################################################
 ##                                DATASETS                                      #

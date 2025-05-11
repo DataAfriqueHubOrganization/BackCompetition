@@ -22,7 +22,15 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("back_datatour/", include('back_datatour.urls')),
+    # path("/", include('back_datatour.urls')),
+    path("auth/", include('apps.auth_user.urls')),
+    path("announcement/", include('apps.announcement.urls')),
+    path("dataset/", include('apps.dataset.urls')),
+    path("partner/", include('apps.partner.urls')),
+    path("submission/", include('apps.submission.urls')),
+    path("competition/", include('apps.competition.urls')),
+    path("comment/", include('apps.comment.urls')),
+    path("team/", include('apps.team.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

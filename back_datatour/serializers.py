@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-
 from back_datatour.models import Users, Partner, Team
 from allauth.account.models import EmailAddress
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import *
+
 
 # class RegisterSerializer(serializers.ModelSerializer):
 #     password = serializers.CharField(write_only=True)
@@ -14,14 +14,16 @@ from .models import *
 class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Partner
-        fields = ['id', 'name', 'description', 'logo', 'website_url'  ]
+        fields = ['id', 'name', 'description', 'logo', 'website_url']
+
 
 class CountrySerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose', read_only=True)
-    
+
     class Meta:
         model = Country
         fields = ['id', 'name']
+
 
 class UserSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
@@ -30,7 +32,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'profession', 'phone',
-                'is_admin', 'country', 'residence_country' ]
+                  'is_admin', 'country', 'residence_country']
+
 
 class TeamSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
@@ -39,7 +42,8 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ['name', 'country', 'members','leader',]
+        fields = ['name', 'country', 'members', 'leader', ]
+
     def validate(self, data):
         members = data.get("members", [])
         leader = data.get("leader", None)
@@ -57,12 +61,13 @@ class TeamSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("the leader need to be a team member")
 
         return data
-      
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ["first_name", "last_name","username", "email", "password", "gender", "country", "residence_country", "profession", "phone"]
+        fields = ["first_name", "last_name", "username", "email", "password", "gender", "country", "residence_country",
+                  "profession", "phone"]
         # fields = ["username", "email", "password", "gender", "country", "residence_country", "profession", "phone", "logo"]
 
     def validate_email(self, value):
@@ -73,7 +78,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # Récupérer et supprimer le mot de passe avant d'instancier l'objet
-        password = validated_data.pop("password")  
+        password = validated_data.pop("password")
 
         # Créer l'utilisateur sans mot de passe
         user = Users(**validated_data)
@@ -81,7 +86,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.generate_verification_token()
 
         # Hasher le mot de passe avant d'enregistrer
-        user.set_password(password)  
+        user.set_password(password)
 
         # Sauvegarder l'utilisateur
         user.save()
@@ -103,14 +108,23 @@ class CompetitionPhaseSerializer(serializers.ModelSerializer):
         model = CompetitionPhase
         fields = ['id', 'competition', 'name', 'start_date', 'end_date']
 
+
 class CompetitionSerializer(serializers.ModelSerializer):
     partners = PartnerSerializer(many=True, read_only=True)
-    phases = CompetitionPhaseSerializer(many=True, read_only=True, source='competitionphase_set')
-    
+
     class Meta:
         model = Competition
-        fields = ['id', 'name', 'description', 'status', 'inscription_start', 
-                  'inscription_end', 'partners', 'phases']
+        fields = [
+            'id',
+            'name',
+            'description',
+            'status',
+            'inscription_start',
+            'inscription_end',
+            'partners'
+        ]
+        read_only_fields = ['id']
+
 
 class DatasetSerializer(serializers.ModelSerializer):
     dataset_train = serializers.FileField(required=True)
@@ -122,32 +136,33 @@ class DatasetSerializer(serializers.ModelSerializer):
         model = Dataset
         fields = '__all__'
 
+
 class ChallengeSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose', read_only=True)
     competition_phase = serializers.SlugRelatedField(queryset=CompetitionPhase.objects.all(), slug_field='name')
     dataset_urls = serializers.SlugRelatedField(many=True, queryset=Dataset.objects.all(), slug_field='name')
-    
+
     class Meta:
         model = Challenge
         fields = '__all__'
-
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose', read_only=True)
     team = serializers.SlugRelatedField(queryset=Team.objects.all(), slug_field='name')
     challenge = serializers.SlugRelatedField(queryset=Challenge.objects.all(), slug_field='name')
-    file = serializers.FileField()  
+    file = serializers.FileField()
 
     class Meta:
         model = Submission
         fields = '__all__'
 
+
 class LeaderboardSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose', read_only=True)
     team = serializers.SlugRelatedField(queryset=Team.objects.all(), slug_field='name')
     competition_phase = serializers.SlugRelatedField(queryset=CompetitionPhase.objects.all(), slug_field='name')
-    
+
     class Meta:
         model = Leaderboard
         fields = '__all__'
@@ -158,6 +173,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'users', 'competition_phase', 'content', 'created_at', 'updated_at']
+
 
 class AnnouncementSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,0 +1,109 @@
+
+partener
+ {
+        "id": "fd37010f-2bf7-4db0-81d4-55714f018f3e",
+        "name": "Orange",
+        "description": "no desc",
+        "logo": null,
+        "website_url": "http://orange.com"
+    },
+    {
+        "id": "bbf00acb-7bde-4ab6-bb99-7ee295635562",
+        "name": "Sonatel",
+        "description": "no desc",
+        "logo": null,
+        "website_url": "http://sontatel.com"
+    },
+    {
+        "id": "2abc30c2-8e6a-46f8-8f89-84c5b9a7df61",
+        "name": "OpenAI",
+        "description": "Fournisseur d'IA de pointe pour les compétitions.",
+        "logo": null,
+        "website_url": "https://openai.com"
+    }
+
+competition
+
+{
+  "name": "Détection de fraude Zindi",
+  "description": "Compétition pour classer les transactions frauduleuses",
+  "status": "Registration",
+  "inscription_start": "2025-05-01T00:00:00Z",
+  "inscription_end": "2025-06-01T00:00:00Z",
+  "partners": ["2abc30c2-8e6a-46f8-8f89-84c5b9a7df61","fd37010f-2bf7-4db0-81d4-55714f018f3e"]
+}
+
+
+phase
+{
+  "competition":"4a45cbaa-7e67-4ddd-a319-b1f0fe378661",
+  "name": "Phase de qualification",
+  "start_date": "2025-06-01T09:00:00Z",
+  "end_date": "2025-07-01T23:59:59Z"
+}
+
+
+challenge
+{
+  "name": "Détection de fraude - Phase 1",
+  "description": {
+    "objectif": "Créer un modèle capable de détecter les transactions frauduleuses.",
+    "instructions": "Utilisez les données fournies dans les datasets pour entraîner votre modèle.",
+    "metrics": "F1 Score"
+  },
+  "competition_phase": "Phase de qualification",
+   "dataset_urls": [
+    "TEST"
+  ]
+}
+
+user:{
+   "last_name": "Diop",
+"first_name": "Aminata",
+"username": "aminadiop",
+"email": "waxiw58981@javbing.com",
+"password": "test1234",
+"profession": "Développeuse",
+"phone": "+221770000001",
+"gender": "f"
+}
+
+{
+
+   
+  "last_name": "Ba",
+  "first_name": "Moussa",
+  "username": "moussaba",
+  "email": "wyk0gbd6yv@bltiwd.com",
+  "password": "test1234",
+  "profession": "Data Scientist",
+  "phone": "+221770000002",
+  "gender": "m"
+
+}
+
+{
+  "last_name": "Sarr",
+  "first_name": "Fatou",
+  "username": "fatousarr",
+  "email": "fatoufall194@gmail.com",
+  "password": "test1234",
+  "profession": "Ingénieure",
+  "phone":  "+221770000003", 
+  "gender": "f"
+}
+"9c967cce-320b-4dad-b20b-28570574f30d",""
+login:
+{# 9c967cce-320b-4dad-b20b-28570574f30d
+  "username ": "aminadiop",
+  "password": "test1234"
+}
+{ 46d3c77d-deac-41da-baef-997bfb963028 leader
+  "username ": "moussaba",
+  "password": "test1234"
+}
+{
+  40de63e2-f499-49f2-afc2-e665c07c467b 
+  "username ": "fatousarr",
+  "password": "test1234"
+}
