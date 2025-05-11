@@ -60,7 +60,7 @@ jobs:
                 #pip install gunicorn psycopg2-binary
                 mkdir -p static
                 mkdir -p staticfiles
-                python3 manage.py makemigrations --noinput
+                #python3 manage.py makemigrations --noinput
                 python3 manage.py migrate
                 python3 manage.py collectstatic --noinput
                 
