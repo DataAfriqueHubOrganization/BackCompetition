@@ -1,0 +1,81 @@
+name: Build and Deploy Django App
+
+on:
+  push:
+    branches:
+      - development # Trigger only on the main branch
+  pull_request:
+    branches:
+      - development
+
+
+#permissions:
+#  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Python for Django
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      # 3. Create .env file from secrets
+      # 6. Create Django .env file
+      - name: Create Django .env file
+        run: |
+            echo "${{ secrets.DJANGO_ENV }}" | base64 --decode > .env
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:   
+            host: ${{ secrets.SERVER_IP }}
+            username: ${{ secrets.SERVER_USER }}
+            password: ${{ secrets.SERVER_PASSWORD }}
+            source: "./*,!.github/*,!.vscode/*"
+            target: ${{ secrets.DEPLOY_PATH }}/
+      - name: Deploy to VM via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+            host: ${{ secrets.SERVER_IP }}
+            username: ${{ secrets.SERVER_USER }}
+            password: ${{ secrets.SERVER_PASSWORD }}
+            port: 22
+            script: |
+
+                cd ${{ secrets.DEPLOY_PATH }}
+                export PATH="$PATH:/usr/bin/python3:/usr/bin/uwsgi"
+                export BASE_DIR=${{ secrets.DEPLOY_PATH }}
+                #uwsgi --version
+                #python -m venv venv
+                source venv/bin/activate
+                pip install -r requirements.txt
+                #pip install django-cors-headers rest_framework_simplejwt djangorestframework-simplejwt
+                #pip install gunicorn psycopg2-binary
+                mkdir -p static
+                mkdir -p staticfiles
+                python3 manage.py makemigrations --noinput
+                python3 manage.py migrate
+                python3 manage.py collectstatic --noinput
+                #set +e
+                #pkill -f gunicorn || echo "gunicorn not running"
+                #set -e
+                #gunicorn settings.wsgi:application --bind 0.0.0.0:8000 --daemon --reload
+
+                #uwsgi --chdir=${{ secrets.DEPLOY_PATH }} --socket 127.0.0.1:8000 --wsgi-file ${{ secrets.DEPLOY_PATH }}/settings/wsgi.py --env DJANGO_SETTINGS_MODULE=back_datatour.settings
+                #--chdir=${{ secrets.DEPLOY_PATH }} \
+                #--module=back_datatour.wsgi:application \
+                #--env DJANGO_SETTINGS_MODULE=back_datatour.settings \
+                #--master \
+                #--socket=0.0.0.0:8000 \      
+                #--processes=5 \                 
+                #--uid=1000 --gid=2000 \         
+                #--max-requests=5000 \           
+                #--vacuum
