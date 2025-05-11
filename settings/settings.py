@@ -45,11 +45,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_filters",
     'rest_framework',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    "back_datatour",
+    # "back_datatour",
     "apps.auth_user",
     "apps.team",
     "apps.announcement",
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  
     'corsheaders',
     'drf_yasg',  
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 
@@ -123,12 +125,25 @@ WSGI_APPLICATION = "settings.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+# Base de données PostgreSQL
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST"),
+        "PORT": config("DB_PORT"),
     }
 }
+
 AUTH_USER_MODEL = 'auth_user.Users'
 
 # Password validation

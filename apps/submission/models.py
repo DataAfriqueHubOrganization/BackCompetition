@@ -3,7 +3,7 @@ import uuid
 from apps.competition.models import Challenge
 from apps.team.models import Team
 from apps.competition.models import CompetitionPhase
-from back_datatour.models import  TimeStampedModel
+from apps.auth_user.models import  TimeStampedModel
 
 class Submission(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

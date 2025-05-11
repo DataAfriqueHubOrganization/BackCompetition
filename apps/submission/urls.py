@@ -10,10 +10,6 @@ router.register(r'leaderboards', LeaderboardViewSet)
 router.register(r'', SubmissionViewSet, basename='submission')
 
 
-
-urlpatterns = [
-    
+urlpatterns = [    
     path('', include(router.urls)),
-
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

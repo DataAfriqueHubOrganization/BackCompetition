@@ -12,14 +12,44 @@ class CompetitionPhaseSerializer(serializers.ModelSerializer):
         model = CompetitionPhase
         fields = ['id', 'competition', 'name', 'start_date', 'end_date']
 
+
+
+
+# class CompetitionCreateSerializer(serializers.ModelSerializer):
+#     partners = serializers.ListField(child=serializers.UUIDField(), write_only=True, required=False)
+#     # phases = serializers.ListField(child=serializers.UUIDField(), write_only=True, required=False)
+
+#     class Meta:
+#         model = Competition
+#         fields = ['name', 'description', 'status', 'inscription_start', 'inscription_end', 'partners', 'phases']
+
+#     def create(self, validated_data):
+#         partners_data = validated_data.pop('partners', [])
+#         phases_data = validated_data.pop('phases', [])
+
+#         competition = Competition.objects.create(**validated_data)
+
+#         # Set ManyToMany partners
+#         if partners_data:
+#             competition.partners.set(partners_data)
+
+#         # Set ForeignKeys on CompetitionPhase objects
+#         from apps.competition.models import CompetitionPhase
+#         CompetitionPhase.objects.filter(id__in=phases_data).update(competition=competition)
+
+#         return competition
+
+
+
+
+
 class CompetitionSerializer(serializers.ModelSerializer):
-    partners = PartnerSerializer(many=True, read_only=True)
-    phases = CompetitionPhaseSerializer(many=True, read_only=True, source='competitionphase_set')
+    partners = serializers.PrimaryKeyRelatedField(queryset=Partner.objects.all(), many=True)
     
     class Meta:
         model = Competition
-        fields = ['id', 'name', 'description', 'status', 'inscription_start', 
-                  'inscription_end', 'partners', 'phases']
+        fields = ['id', 'name', 'description', 'status', 'inscription_start',
+                  'inscription_end', 'partners']
 
 class ChallengeSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose', read_only=True)
@@ -30,3 +60,10 @@ class ChallengeSerializer(serializers.ModelSerializer):
         model = Challenge
         fields = '__all__'
 
+
+
+class CompetitionParticipantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompetitionParticipant
+        fields = ['id', 'user', 'competition', 'team', 'joined_at']
+        read_only_fields = ['id', 'user', 'joined_at']
