@@ -84,7 +84,7 @@ class TeamSerializer(serializers.ModelSerializer):
                 recipient_list=[user.email]
             )
 
-        send_team_creation_emails(team.name, members, leader)
+        # send_team_creation_emails(team.name, members, leader)
         return team
 
 

@@ -60,7 +60,9 @@ class CompetitionDetail(APIView):
     def delete(self, request, pk):
         competition = self.get_object(pk)
         competition.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"detail":"compétition supprimée avec succès"},
+            status=status.HTTP_204_NO_CONTENT)
 
 
 ###################################################################################
@@ -89,7 +91,7 @@ class CompetitionPhaseListCreate(APIView):
                 {'detail': 'Une compétition ne peut pas avoir plus de 2 phases.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
+    
         serializer = CompetitionPhaseSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -209,6 +211,8 @@ class ParticipateInCompetition(APIView):
 
             # Créer la demande
             TeamJoinRequest.objects.create(user=user, team=team)
+            
+            TeamJoinRequest.objects.create(user=team.leader, team=team)
 
             # Notification au leader
             send_emails(

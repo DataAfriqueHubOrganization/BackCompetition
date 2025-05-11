@@ -22,7 +22,11 @@ class ListOrCreatePartner(APIView):
     Gère la liste et la création des partenaires.
     """
     permission_classes = [AllowAny]
-
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated(), IsAdminUser()]
+        return [AllowAny()]
+    
     @swagger_auto_schema(
         operation_description="Liste tous les partenaires disponibles.",
         responses={200: PartnerSerializer(many=True), 404: "Aucun partenaire trouvé"}

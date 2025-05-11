@@ -22,16 +22,8 @@ class TeamJoinRequest(TimeStampedModel):
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="join_requests")
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')], default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
-
+    #invitation ou demande
+    team_join_request_status = models.CharField(max_length=20, choices=[('invitation', 'Invitation'), ('demande', 'Demande')], default='invitation')
 
     def __str__(self):
         return self.user.username + " - " + self.team.name
-    # def accept(self):
-    #     self.status = 'accepted'
-    #     self.save()
-    # def reject(self):
-    #     self.status = 'rejected'
-    #     self.save()
-    # def pending(self):
-    #     self.status = 'pending'
-    #     self.save()

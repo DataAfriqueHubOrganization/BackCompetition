@@ -7,6 +7,7 @@ from apps.partner.models import Partner
 from apps.auth_user.models import  TimeStampedModel
 from django.conf import settings
 from apps.team.models import Team
+from django.core.exceptions import ValidationError
 
 class Competition(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -16,7 +17,7 @@ class Competition(TimeStampedModel):
         ('Ongoing', 'ONGOING'),
         ('Closed', 'CLOSED'),
     ]
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     status = models.CharField(
         max_length=15,
@@ -38,11 +39,35 @@ class Competition(TimeStampedModel):
     def __str__(self):
         return self.name
 class CompetitionPhase(TimeStampedModel):
+    PHASE_CHOICES = (
+        ('national', 'National'),
+        ('international', 'International'),
+    )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=20, choices=PHASE_CHOICES)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+
+##### mettre des message erreur parlant!
+    def clean (self):
+        super().clean()
+        if self.name == 'international':
+            phase_national = CompetitionPhase.objects.filter(competition=self.competition, name='national').first()
+            if not phase_national:
+                raise ValidationError("La phase nationale doit exister avant de créer une phase internationale.")
+            
+            if phase_national.end_date >= self.start_date:
+                raise ValidationError({"phase":"La date de début de la phase internationale doit être après la date de fin de la phase nationale."})
+
+        # Vérification de la validité des dates
+        if self.start_date >= self.end_date:
+            raise ValidationError("La date de début doit être antérieure à la date de fin.")
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+    
     @property
     def is_finished(self):
         return timezone.now() > self.end_date
