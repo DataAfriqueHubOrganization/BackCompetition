@@ -82,7 +82,7 @@ REST_FRAMEWORK = {
 
 # Configuration spécifique à Simple JWT
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Durée de vie du token d'accès (30 minutes ici)
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Durée de vie du token d'accès (30 minutes ici)
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Durée de vie du refresh token (1 jour ici)
     'ROTATE_REFRESH_TOKENS': False,  # Si tu veux ou non faire tourner les refresh tokens
     'BLACKLIST_AFTER_ROTATION': True,  # Si tu veux bloquer les anciens refresh tokens
