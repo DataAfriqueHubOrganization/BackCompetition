@@ -58,4 +58,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = [
+            'id', 'first_name', 'last_name', 'email', 'gender', 'country', 
+            'residence_country', 'profession', 'phone', 'is_verified', 'status'
+        ]
+
+    def create(self, validated_data):
+        validated_data['is_admin'] = True
+        user = Users.objects.create_user(**validated_data)
+        return user
     

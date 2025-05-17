@@ -11,7 +11,9 @@ class Submission(TimeStampedModel):
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, related_name="submissions")
     file = models.FileField(upload_to="static/submissions/")
     score = models.FloatField(null=True, blank=True)
+    limit = models.IntegerField(default=5)
 
+#creation de score 
 
 class Leaderboard(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

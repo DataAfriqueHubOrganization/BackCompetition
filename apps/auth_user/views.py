@@ -239,3 +239,16 @@ class UserDetail(APIView):
         user = get_object_or_404(Users, pk=pk)
         user.delete()
         return Response({"message": "Utilisateur supprimé avec succès."}, status=status.HTTP_204_NO_CONTENT)
+
+
+#Admin API
+from rest_framework import viewsets, permissions
+from .serializers import AdminUserSerializer
+
+class AdminUserViewSet(viewsets.ModelViewSet):
+    queryset = Users.objects.filter(is_admin=True)
+    serializer_class = AdminUserSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Ajuste selon les besoins
+
+    def perform_create(self, serializer):
+        serializer.save(is_admin=True)
