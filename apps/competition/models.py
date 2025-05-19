@@ -1,13 +1,25 @@
 from django.db import models
 import uuid
 from django.utils import timezone
-from apps.dataset.models import  Dataset
+from apps.dataset.models import  DatasetFile, Dataset
 from apps.partner.models import Partner
 # Create your models here.
 from apps.auth_user.models import  TimeStampedModel
 from django.conf import settings
 from apps.team.models import Team
 from django.core.exceptions import ValidationError
+
+
+"""""
+le statut de competion change de:
+comming soon à registration  sssi today == date de debut inscription; Competition
+de registration à ongoing si today == date de debut de la phase nationale; CompetitionPhase
+de ongoing à closed si today == date de fin de la phase internationale; CompetitionPhase
+inscription_start
+on verifie si c'est nationla ou non puis on tag start_date
+"""
+
+
 
 class Competition(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -81,7 +93,8 @@ class Challenge(TimeStampedModel):
     # description = models.TextField()
     description  = models.JSONField(default = dict) ## on stcokera un json
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
-    dataset_urls = models.ManyToManyField(Dataset, related_name="dataset")
+    dataset_urls = models.ManyToManyField(DatasetFile, related_name="dataset")
+    metric = models.CharField(max_length=255, blank=True, null=True)
     def is_active(self):
         return not self.competition_phase.is_finished
 

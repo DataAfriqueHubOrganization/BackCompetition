@@ -80,3 +80,11 @@ def zip_competition_folder(sender, instance, created, **kwargs):
         
         
         
+"""""
+le statut de competion change de:
+comming soon à registration  sssi today == date de debut inscription ;Competition
+de registration à ongoing si today == date de debut de la phase nationale; CompetitionPhase
+de ongoing à closed si today == date de fin de la phase internationale; CompetitionPhase
+inscription_start
+on verifie si c'est nationla ou non puis on tag start_date
+"""

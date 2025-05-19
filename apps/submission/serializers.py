@@ -14,13 +14,13 @@ class SubmissionSerializer(serializers.ModelSerializer):
         model = Submission
         fields = '__all__'
 
-class LeaderboardSerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField(format='hex_verbose', read_only=True)
-    team = serializers.SlugRelatedField(queryset=Team.objects.all(), slug_field='name')
-    competition_phase = serializers.SlugRelatedField(queryset=CompetitionPhase.objects.all(), slug_field='name')
+# class LeaderboardSerializer(serializers.ModelSerializer):
+#     id = serializers.UUIDField(format='hex_verbose', read_only=True)
+#     team = serializers.SlugRelatedField(queryset=Team.objects.all(), slug_field='name')
+#     competition_phase = serializers.SlugRelatedField(queryset=CompetitionPhase.objects.all(), slug_field='name')
     
-    class Meta:
-        model = Leaderboard
-        fields = '__all__'
-        read_only_fields = ('id', 'created_at', 'updated_at')
+#     class Meta:
+#         model = Leaderboard
+#         fields = '__all__'
+#         read_only_fields = ('id', 'created_at', 'updated_at')
 
