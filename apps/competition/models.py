@@ -19,10 +19,12 @@ inscription_start
 on verifie si c'est nationla ou non puis on tag start_date
 """
 
-
+def competition_image_upload_path(instance, filename):
+    return f'images_folder/competition/{instance.id}/{filename}'
 
 class Competition(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    competition_image = models.ImageField(upload_to=competition_image_upload_path,blank=True, null=True)
     Statut_choice = [
         ('Comming soon', 'COMMING SOON'),
         ('Registration', 'REGISTRATION'),
@@ -93,7 +95,7 @@ class Challenge(TimeStampedModel):
     # description = models.TextField()
     description  = models.JSONField(default = dict) ## on stcokera un json
     competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
-    dataset_urls = models.ManyToManyField(DatasetFile, related_name="dataset")
+    dataset_urls = models.ManyToManyField(DatasetFile, related_name="datasetfile")
     metric = models.CharField(max_length=255, blank=True, null=True)
     def is_active(self):
         return not self.competition_phase.is_finished

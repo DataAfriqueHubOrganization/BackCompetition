@@ -13,4 +13,6 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [    
     # path('', include(router.urls)),
     path('', SubmissionCreateAPIView.as_view(), name='submission-create'),
+    path('submissions/', SubmissionListAPIView.as_view(), name='submission-list'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

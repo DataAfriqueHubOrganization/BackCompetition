@@ -19,7 +19,7 @@ class Submission(TimeStampedModel):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="submissions")
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, related_name="submissions")
     file = models.FileField(upload_to="static/submissions/")
-    score = models.FloatField()
+    score = models.FloatField(default=0)
     # score = models.ForeignKey(Score, on_delete=models.CASCADE, related_name="scores")
     limit = models.IntegerField(default=5)
 

@@ -21,9 +21,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'profession', 'phone',
-                'is_admin', 'country', 'residence_country' ]
+                'is_admin', 'country', 'residence_country','avatar' ]
       
-
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
@@ -65,7 +64,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         model = Users
         fields = [
             'id', 'first_name', 'last_name', 'email', 'gender', 'country', 
-            'residence_country', 'profession', 'phone', 'is_verified', 'status'
+            'residence_country', 'profession', 'phone', 'is_verified', 'status', 'avatar'
         ]
 
     def create(self, validated_data):

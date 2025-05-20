@@ -6,13 +6,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import *
 
-
 class CompetitionPhaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompetitionPhase
         fields = ['id', 'competition', 'name', 'start_date', 'end_date']
-
-
 
 
 # class CompetitionCreateSerializer(serializers.ModelSerializer):
@@ -39,17 +36,24 @@ class CompetitionPhaseSerializer(serializers.ModelSerializer):
 
 #         return competition
 
-
-
-
+# class CompetitionSerializer(serializers.ModelSerializer):
+#     partners = serializers.PrimaryKeyRelatedField(queryset=Partner.objects.all(), many=True)
+    
+#     class Meta:
+#         model = Competition
+#         fields = ['id', 'name', 'description', 'status', 'inscription_start', 'inscription_end', 'partners']
 
 class CompetitionSerializer(serializers.ModelSerializer):
     partners = serializers.PrimaryKeyRelatedField(queryset=Partner.objects.all(), many=True)
-    
+    phases = serializers.SerializerMethodField()
+
     class Meta:
         model = Competition
-        fields = ['id', 'name', 'description', 'status', 'inscription_start',
-                  'inscription_end', 'partners']
+        fields = ['id', 'competition_image','name', 'description', 'status', 'inscription_start', 'inscription_end', 'partners', 'phases']
+
+    def get_phases(self, obj):
+        phases = CompetitionPhase.objects.filter(competition=obj)
+        return [phase.id for phase in phases]
 
 class ChallengeSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose', read_only=True)

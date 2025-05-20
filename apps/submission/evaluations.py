@@ -1,11 +1,11 @@
 import pandas as pd
-from sklearn.metrics import (
-    mean_squared_error,
-    mean_absolute_error,
-    r2_score,
-    mean_squared_log_error
-)
-import numpy as np
+# from sklearn.metrics import (
+#     mean_squared_error,
+#     mean_absolute_error,
+#     r2_score,
+#     mean_squared_log_error
+# )
+# import numpy as np
 import json
 def evaluate_submission(submission_path, reference_path, metric='mse'):
     """
