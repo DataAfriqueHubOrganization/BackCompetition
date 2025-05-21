@@ -94,8 +94,8 @@ class Challenge(TimeStampedModel):
     name = models.CharField(max_length=255)
     # description = models.TextField()
     description  = models.JSONField(default = dict) ## on stcokera un json
-    competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE)
-    dataset_urls = models.ManyToManyField(DatasetFile, related_name="datasetfile")
+    competition_phase = models.ForeignKey(CompetitionPhase, on_delete=models.CASCADE, blank=True, null=True)
+    dataset = models.ForeignKey(Dataset, related_name="dataset", on_delete=models.CASCADE, blank=True, null=True)
     metric = models.CharField(max_length=255, blank=True, null=True)
     def is_active(self):
         return not self.competition_phase.is_finished

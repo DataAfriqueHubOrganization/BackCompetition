@@ -58,7 +58,7 @@ class CompetitionSerializer(serializers.ModelSerializer):
 class ChallengeSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose', read_only=True)
     competition_phase = serializers.SlugRelatedField(queryset=CompetitionPhase.objects.all(), slug_field='name')
-    dataset_urls = serializers.SlugRelatedField(many=True, queryset=Dataset.objects.all(), slug_field='name')
+    # dataset_urls = serializers.SlugRelatedField(many=True, queryset=Dataset.objects.all(), slug_field='name')
     
     class Meta:
         model = Challenge
