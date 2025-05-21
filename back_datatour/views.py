@@ -480,20 +480,20 @@ class CompetitionPhaseViewSet(viewsets.ModelViewSet):
 ##                                COUNTRIES                                        #
 ###################################################################################
 
-class CountryViewSet(viewsets.ModelViewSet):
-    queryset = Country.objects.all().order_by('name')
-    serializer_class = CountrySerializer
-    permission_classes = [permissions.AllowAny]
+# class CountryViewSet(viewsets.ModelViewSet):
+#     queryset = Country.objects.all().order_by('name')
+#     serializer_class = CountrySerializer
+#     permission_classes = [permissions.AllowAny]
 
 
-class CountryView(APIView):
-    def get(self, request, name):
-        country = get_object_or_404(Country, name=name)
-        serializer = CountrySerializer(country)
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-        )
+# class CountryView(APIView):
+#     def get(self, request, name):
+#         country = get_object_or_404(Country, name=name)
+#         serializer = CountrySerializer(country)
+#         return Response(
+#             serializer.data,
+#             status=status.HTTP_200_OK
+#         )
 
 ###################################################################################
 ##                                DATASETS                                      #

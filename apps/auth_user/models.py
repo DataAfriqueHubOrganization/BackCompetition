@@ -21,9 +21,10 @@ class Country(TimeStampedModel):
     def __str__(self):
         return self.name
     
+    
+    
 def user_image_upload_path(instance, filename):
     return f'images_folder/user/{filename}'
-
 
 
 class Users(AbstractUser):
