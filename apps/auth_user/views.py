@@ -15,12 +15,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from .models import Users
-from .serializers import RegisterSerializer, UserSerializer
-# from ...permissions import IsAdminOrReadOnly
+from .models import Users,Country
+from .serializers import RegisterSerializer, UserSerializer,CountrySerializer
 from .permissions import IsAdminOrReadOnly
-
-
+from rest_framework import viewsets
 User = get_user_model()
 
 ##########################################
@@ -240,6 +238,12 @@ class UserDetail(APIView):
         user.delete()
         return Response({"message": "Utilisateur supprimé avec succès."}, status=status.HTTP_204_NO_CONTENT)
 
+# country api
+# views.py
+
+class CountryViewSet(viewsets.ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
 
 #Admin API
 from rest_framework import viewsets, permissions
