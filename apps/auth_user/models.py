@@ -20,10 +20,16 @@ class Country(TimeStampedModel):
 
     def __str__(self):
         return self.name
+    
+def user_image_upload_path(instance, filename):
+    return f'images_folder/user/{filename}'
+
 
 
 class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    avatar = models.ImageField(upload_to=user_image_upload_path, blank=True, null=True)
+    user_image = models.ImageField(upload_to="users/", blank=True, null=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     gender = models.CharField(

@@ -3,10 +3,15 @@ from .views import *
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'admins', AdminUserViewSet, basename='admin-user')
 
 
 urlpatterns = [
-
+    path('', include(router.urls)),
+    
     path('register/', RegisterView.as_view(), name='register'),
     path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('login/', LoginView.as_view(), name='login'),  # API de login
@@ -20,4 +25,10 @@ urlpatterns = [
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+
+
+
+    
 

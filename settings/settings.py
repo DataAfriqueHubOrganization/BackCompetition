@@ -190,6 +190,8 @@ STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+COMPETITION_FOLDER = os.path.join(MEDIA_ROOT, "competitions")
+IMAGE_FOLDER = os.path.join(MEDIA_ROOT, "images_folder")  # Pour les images
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
