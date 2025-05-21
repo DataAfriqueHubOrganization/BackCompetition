@@ -30,11 +30,13 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_CREDENTIALS = True
-
+"""
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
 ]
+"""
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -80,7 +82,7 @@ REST_FRAMEWORK = {
 
 # Configuration spécifique à Simple JWT
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Durée de vie du token d'accès (30 minutes ici)
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Durée de vie du token d'accès (30 minutes ici)
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Durée de vie du refresh token (1 jour ici)
     'ROTATE_REFRESH_TOKENS': False,  # Si tu veux ou non faire tourner les refresh tokens
     'BLACKLIST_AFTER_ROTATION': True,  # Si tu veux bloquer les anciens refresh tokens
@@ -185,7 +187,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 COMPETITION_FOLDER = os.path.join(MEDIA_ROOT, "competitions")
@@ -199,12 +201,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ########################################
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'

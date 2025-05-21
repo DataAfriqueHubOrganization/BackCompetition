@@ -508,7 +508,7 @@ class DatasetViewSet(viewsets.ModelViewSet):
     
     @swagger_auto_schema(
         operation_description="Uploader les datasets de la compétition",
-        request_body=DatasetSerializer,  # 🔥 Bien préciser le bon serializer
+        request_body=DatasetSerializer,  
         responses={201: "Upload réussi", 400: "Erreur de validation"}
     )
     def create(self, request, *args, **kwargs):
